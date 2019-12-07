@@ -28,10 +28,14 @@ namespace EventStoreAdapter
             return new EventStoreSubscription(catchUpSubscription);
         }
 
-        private static Message Convert(ResolvedEvent resolvedEvent)
+        private static DomainEvent Convert(ResolvedEvent resolvedEvent)
         {
             var streamName = StreamName.Of(resolvedEvent.OriginalEvent.EventStreamId);
-            return Message.Of(streamName, resolvedEvent.Event.Data, resolvedEvent.Event.Metadata);
+            return DomainEvent.Of(
+                resolvedEvent.Event.EventNumber,
+                streamName,
+                resolvedEvent.Event.Data,
+                resolvedEvent.Event.Metadata);
         }
     }
 }

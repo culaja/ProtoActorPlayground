@@ -2,31 +2,39 @@
 
 namespace Domain
 {
-    public sealed class Message
+    public sealed class DomainEvent
     {
-        public Message(string aggregateId, string data, string metaData)
+        public DomainEvent(
+            long number,
+            string aggregateId,
+            string data,
+            string metaData)
         {
+            Number = number;
             AggregateId = aggregateId;
             Data = data;
             MetaData = metaData;
         }
 
-        public static Message Of(
+        public static DomainEvent Of(
+            long number,
             string aggregateId,
             byte[] data, 
             byte[] metaData) 
-                => new Message(
+                => new DomainEvent(
+                    number,
                     aggregateId, 
                     Encoding.UTF8.GetString(data),
                     Encoding.UTF8.GetString(metaData));
 
+        public long Number { get; }
         public string AggregateId { get; }
         public string Data { get; }
         public string MetaData { get; }
 
         public override string ToString()
         {
-            return $"{nameof(AggregateId)}: {AggregateId}, {nameof(Data)}: {Data}, {nameof(MetaData)}: {MetaData}";
+            return $"{nameof(Number)}: {Number}, {nameof(AggregateId)}: {AggregateId}, {nameof(Data)}: {Data}, {nameof(MetaData)}: {MetaData}";
         }
     }
 }

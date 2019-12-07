@@ -7,7 +7,7 @@ namespace EventStoreReaderTestApp
 {
     internal sealed class EventStoreReceiver : IEventStoreStreamMessageReceiver
     {
-        public void Receive(Message message)
+        public void Receive(DomainEvent message)
         {
             Console.WriteLine(message);
         }
