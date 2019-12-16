@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Text;
+using Domain;
 using EventStore.ClientAPI;
 using Ports;
 using static EventStoreAdapter.EventStoreConnectionProvider;
@@ -34,8 +35,8 @@ namespace EventStoreAdapter
             return DomainEvent.Of(
                 resolvedEvent.Event.EventNumber,
                 streamName,
-                resolvedEvent.Event.Data,
-                resolvedEvent.Event.Metadata);
+                Encoding.UTF8.GetString(resolvedEvent.Event.Data),
+                Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
         }
     }
 }

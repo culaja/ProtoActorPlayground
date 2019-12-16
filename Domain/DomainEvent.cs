@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using Framework;
 
 namespace Domain
 {
-    public sealed class DomainEvent
+    public sealed class DomainEvent : ValueObject
     {
         public DomainEvent(
             long number,
@@ -19,13 +20,13 @@ namespace Domain
         public static DomainEvent Of(
             long number,
             string aggregateId,
-            byte[] data, 
-            byte[] metaData) 
+            string data, 
+            string metaData) 
                 => new DomainEvent(
                     number,
                     aggregateId, 
-                    Encoding.UTF8.GetString(data),
-                    Encoding.UTF8.GetString(metaData));
+                    data,
+                    metaData);
 
         public long Number { get; }
         public string AggregateId { get; }
@@ -35,6 +36,14 @@ namespace Domain
         public override string ToString()
         {
             return $"{nameof(Number)}: {Number}, {nameof(AggregateId)}: {AggregateId}, {nameof(Data)}: {Data}, {nameof(MetaData)}: {MetaData}";
+        }
+
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return Number;
+            yield return AggregateId;
+            yield return Data;
+            yield return MetaData;
         }
     }
 }
