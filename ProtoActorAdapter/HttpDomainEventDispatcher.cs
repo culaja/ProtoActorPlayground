@@ -18,17 +18,24 @@ namespace ProtoActorAdapter
             _destinationUri = destinationUri;
         }
         
-        public Task<bool> Dispatch(DomainEvent @event)
+        public async Task<bool> Dispatch(DomainEvent @event)
         {
-            return Task.FromResult(true);
-            // var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _destinationUri)
-            // {
-            //     Content = new StringContent(SerializeObject(@event), Encoding.UTF8, "application/json")
-            // };
-            //
-            // var response = await HttpClient.SendAsync(httpRequestMessage);
-            //
-            // return response.IsSuccessStatusCode;
+            if (@event.Number % 10000 == 0)
+            {
+                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _destinationUri)
+                {
+                    Content = new StringContent(SerializeObject(@event), Encoding.UTF8, "application/json")
+                };
+            
+                var response = await HttpClient.SendAsync(httpRequestMessage);
+            
+                return response.IsSuccessStatusCode;
+            }
+            else
+            {
+                await Task.Delay(10);
+                return true;
+            }
         }
     }
 }

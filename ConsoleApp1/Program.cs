@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using ProtoActorAdapter;
@@ -37,7 +36,7 @@ namespace ConsoleApp1
             //foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))
             for (var i = 1; i <= 100000; i++)
             {
-                domainEventApplier.Pass(DomainEvent.Of(i, $"Aggregate{i % 10000}", "{}", "{}"));
+                domainEventApplier.Pass(DomainEvent.Of(i, $"Aggregate{i%10000}", "{}", "{}"));
             }
             
             Console.ReadLine();

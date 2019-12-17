@@ -20,8 +20,6 @@ namespace ProtoActorAdapter
             var eventStore = await BuildEventStoreUsing(configuration);
             
             var props = Props.FromProducer(() => new RootActor(
-                eventStore,
-                configuration.StreamsPrefix, 
                 domainEventDestinationUri));
             
             var pid = context.Spawn(props);
