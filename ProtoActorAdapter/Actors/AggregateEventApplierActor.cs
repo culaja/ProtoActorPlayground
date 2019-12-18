@@ -9,11 +9,13 @@ namespace ProtoActorAdapter.Actors
 {
     internal sealed class AggregateEventApplierActor : IActor
     {
+        private readonly PID _applierEventTrackerActorPid;
         private readonly HttpDomainEventDispatcher _domainEventDispatcher;
         private readonly Queue<DomainEvent> _queue = new Queue<DomainEvent>();
 
-        public AggregateEventApplierActor(Uri destinationUri)
+        public AggregateEventApplierActor(PID applierEventTrackerActorPid, Uri destinationUri)
         {
+            _applierEventTrackerActorPid = applierEventTrackerActorPid;
             _domainEventDispatcher = new HttpDomainEventDispatcher(destinationUri);
         }
 
@@ -50,6 +52,7 @@ namespace ProtoActorAdapter.Actors
                     if (await result)
                     {
                         context.Send(context.Self, new DomainEventApplied(@event));
+                        context.Send(_applierEventTrackerActorPid, new DomainEventApplied(@event));
                     }
                     else
                     {

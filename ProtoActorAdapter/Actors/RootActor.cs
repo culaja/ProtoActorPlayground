@@ -8,13 +8,15 @@ namespace ProtoActorAdapter.Actors
 {
     internal sealed class RootActor : IActor
     {
+        private readonly PID _applierEventTrackerActorPid;
         private readonly Uri _destinationUri;
         
         private readonly Dictionary<string, PID> _appliersByAggregateId = new Dictionary<string, PID>();
         private long _lastRoutedEvent = -1;
 
-        public RootActor(Uri destinationUri)
+        public RootActor(PID applierEventTrackerActorPid, Uri destinationUri)
         {
+            _applierEventTrackerActorPid = applierEventTrackerActorPid;
             _destinationUri = destinationUri;
         }
 
@@ -48,7 +50,7 @@ namespace ProtoActorAdapter.Actors
 
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
-            var props = Props.FromProducer(() => new AggregateEventApplierActor(_destinationUri));
+            var props = Props.FromProducer(() => new AggregateEventApplierActor(_applierEventTrackerActorPid, _destinationUri));
             var applierActor = context.Spawn(props);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;

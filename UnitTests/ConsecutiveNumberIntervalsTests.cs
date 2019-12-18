@@ -24,7 +24,7 @@ namespace UnitTests
                 
             foreach (var number in domainEventNumbers) appliedDomainEvents.MarkAsApplied(number);
 
-            appliedDomainEvents.LastConsecutiveAppliedEventNumber
+            appliedDomainEvents.LargesConsecutiveNumber
                 .Should().Be(lastConsecutiveAppliedEventNumber);
         }
     }

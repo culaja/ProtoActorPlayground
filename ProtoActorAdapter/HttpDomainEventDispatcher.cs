@@ -20,22 +20,14 @@ namespace ProtoActorAdapter
         
         public async Task<bool> Dispatch(DomainEvent @event)
         {
-            if (@event.Number % 10000 == 0)
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _destinationUri)
             {
-                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _destinationUri)
-                {
-                    Content = new StringContent(SerializeObject(@event), Encoding.UTF8, "application/json")
-                };
-            
-                var response = await HttpClient.SendAsync(httpRequestMessage);
-            
-                return response.IsSuccessStatusCode;
-            }
-            else
-            {
-                await Task.Delay(10);
-                return true;
-            }
+                Content = new StringContent(SerializeObject(@event), Encoding.UTF8, "application/json")
+            };
+        
+            var response = await HttpClient.SendAsync(httpRequestMessage);
+        
+            return response.IsSuccessStatusCode;
         }
     }
 }

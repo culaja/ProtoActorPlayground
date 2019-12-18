@@ -6,12 +6,19 @@ namespace Domain
 {
     public sealed class ConsecutiveNumberIntervals : ValueObject
     {
-        private readonly List<ConsecutiveNumberInterval> _sortedConsecutiveNumberIntervals = new List<ConsecutiveNumberInterval>
+        private readonly List<ConsecutiveNumberInterval> _sortedConsecutiveNumberIntervals;
+
+        private ConsecutiveNumberIntervals(long staringPoint)
         {
-            ConsecutiveNumberInterval.NewFor(0)
-        };
+            _sortedConsecutiveNumberIntervals = new List<ConsecutiveNumberInterval>
+            {
+                ConsecutiveNumberInterval.NewFor(0, staringPoint)
+            };
+        }
         
-        public static ConsecutiveNumberIntervals New() => new ConsecutiveNumberIntervals();
+        public static ConsecutiveNumberIntervals New() => new ConsecutiveNumberIntervals(0);
+        
+        public static ConsecutiveNumberIntervals StartFrom(long staringPoint) => new ConsecutiveNumberIntervals(staringPoint);
         
         public void MarkAsApplied(long eventNumber)
         {
@@ -62,7 +69,7 @@ namespace Domain
 
         private static bool LeftIntervalExistsFor(int position) => position > 0;
 
-        public long LastConsecutiveAppliedEventNumber => _sortedConsecutiveNumberIntervals.First().Tail;
+        public long LargesConsecutiveNumber => _sortedConsecutiveNumberIntervals.First().Tail;
         
         protected override IEnumerable<object> GetEqualityComponents()
         {
