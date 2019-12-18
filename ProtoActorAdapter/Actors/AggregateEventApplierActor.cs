@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Domain;
 using Proto;
 using ProtoActorAdapter.Actors.Messages;
+using static System.Threading.Tasks.Task;
 
 namespace ProtoActorAdapter.Actors
 {
@@ -19,7 +20,7 @@ namespace ProtoActorAdapter.Actors
             _domainEventDispatcher = new HttpDomainEventDispatcher(destinationUri);
         }
 
-        public async Task ReceiveAsync(IContext context)
+        public Task ReceiveAsync(IContext context)
         {
             switch (context.Message)
             {
@@ -35,6 +36,8 @@ namespace ProtoActorAdapter.Actors
                     HandleDomainAppliedEvent(context, message);
                     break;
             }
+            
+            return CompletedTask;
         }
         
         private void HandleEnqueueDomainEvent(IContext context, EnqueueDomainEvent message)
@@ -51,8 +54,9 @@ namespace ProtoActorAdapter.Actors
                 {
                     if (await result)
                     {
-                        context.Send(context.Self, new DomainEventApplied(@event));
-                        context.Send(_applierEventTrackerActorPid, new DomainEventApplied(@event));
+                        var message = new DomainEventApplied(@event);
+                        context.Send(context.Self, message);
+                        context.Send(_applierEventTrackerActorPid, message);
                     }
                     else
                     {

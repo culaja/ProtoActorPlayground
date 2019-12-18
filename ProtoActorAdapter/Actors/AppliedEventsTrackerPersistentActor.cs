@@ -23,20 +23,20 @@ namespace ProtoActorAdapter.Actors
             _persistence = Persistence.WithSnapshotting(snapshotStore, actorId, ApplySnapshot);
         }
 
-        public async Task ReceiveAsync(IContext context)
+        public Task ReceiveAsync(IContext context)
         {
             switch (context.Message)
             {
                 case Started _:
-                    await _persistence.RecoverStateAsync();
-                    break;
+                    return _persistence.RecoverStateAsync();
                 case ReadLastRoutedEvent _:
                     context.Respond(new LastRoutedDomainEvent(_consecutiveNumberIntervals.LargestConsecutiveNumber));
                     break;
                 case DomainEventApplied message:
-                    await HandleDomainEventApplied(context, message);
-                    break;
+                    return HandleDomainEventApplied(context, message);
             }
+
+            return CompletedTask;
         }
 
         private Task HandleDomainEventApplied(IContext context, DomainEventApplied message)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Proto;
 using ProtoActorAdapter.Actors.Messages;
+using static System.Threading.Tasks.Task;
 
 namespace ProtoActorAdapter.Actors
 {
@@ -35,7 +36,7 @@ namespace ProtoActorAdapter.Actors
                     break;
             }
 
-            return Task.CompletedTask;
+            return CompletedTask;
         }
 
         private PID LocateChildActorForDomainEvent(IContext context, RouteDomainEvent domainEvent)
