@@ -20,12 +20,17 @@ namespace Domain
         
         public static ConsecutiveNumberIntervals StartFrom(long staringPoint) => new ConsecutiveNumberIntervals(staringPoint);
         
-        public void MarkAsApplied(long eventNumber)
+        public void Insert(long number)
         {
-            var newInterval = ConsecutiveNumberInterval.NewFor(eventNumber);
-            var insertPosition = FindInsertPositionFor(newInterval);
+            var newInterval = ConsecutiveNumberInterval.NewFor(number);
+            Insert(newInterval);
+        }
+
+        public void Insert(ConsecutiveNumberInterval interval)
+        {
+            var insertPosition = FindInsertPositionFor(interval);
             
-            _sortedConsecutiveNumberIntervals.Insert(insertPosition, newInterval);
+            _sortedConsecutiveNumberIntervals.Insert(insertPosition, interval);
 
             TryMergeRightWithMiddle(insertPosition);
             TryMergeLeftWithMiddle(insertPosition);
@@ -69,7 +74,7 @@ namespace Domain
 
         private static bool LeftIntervalExistsFor(int position) => position > 0;
 
-        public long LargesConsecutiveNumber => _sortedConsecutiveNumberIntervals.First().Tail;
+        public long LargestConsecutiveNumber => _sortedConsecutiveNumberIntervals.First().Tail;
         
         protected override IEnumerable<object> GetEqualityComponents()
         {

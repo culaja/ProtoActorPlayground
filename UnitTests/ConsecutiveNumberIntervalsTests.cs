@@ -22,9 +22,9 @@ namespace UnitTests
         {
             var appliedDomainEvents = ConsecutiveNumberIntervals.New();
                 
-            foreach (var number in domainEventNumbers) appliedDomainEvents.MarkAsApplied(number);
+            foreach (var number in domainEventNumbers) appliedDomainEvents.Insert(number);
 
-            appliedDomainEvents.LargesConsecutiveNumber
+            appliedDomainEvents.LargestConsecutiveNumber
                 .Should().Be(lastConsecutiveAppliedEventNumber);
         }
     }

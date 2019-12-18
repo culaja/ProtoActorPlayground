@@ -19,7 +19,10 @@ namespace ProtoActorAdapter
 
             var eventStore = await BuildEventStoreUsing(configuration);
 
-            var applierEventTrackerActorPid = BuildAppliedEventsTrackerPersistentActorUsing(context);
+            var applierEventTrackerActorPid = BuildAppliedEventsTrackerPersistentActorUsing(
+                context,
+                configuration,
+                eventStore);
             
             var rootActorPid = BuildRootActorUsing(
                 context,
@@ -29,7 +32,7 @@ namespace ProtoActorAdapter
             return new DomainEventApplier(context, rootActorPid, applierEventTrackerActorPid);
         }
 
-        private static async Task<IEventStore> BuildEventStoreUsing(EventStoreConfiguration configuration)
+        private static async Task<ISnapshotStore> BuildEventStoreUsing(EventStoreConfiguration configuration)
         {
             var eventStoreConnection = EventStoreConnection.Create(
                 configuration.ConnectionString,
@@ -41,9 +44,15 @@ namespace ProtoActorAdapter
             return new EventStoreProvider(eventStoreConnection);
         }
 
-        private static PID BuildAppliedEventsTrackerPersistentActorUsing(RootContext rootContext)
+        private static PID BuildAppliedEventsTrackerPersistentActorUsing(
+            RootContext rootContext,
+            EventStoreConfiguration configuration,
+            ISnapshotStore snapshotStore)
         {
-            var props = Props.FromProducer(() => new AppliedEventsTrackerPersistentActor());
+            var props = Props.FromProducer(() => new AppliedEventsTrackerPersistentActor(
+                snapshotStore,
+                configuration.SnapshotName,
+                configuration.EventNumberPersistTrigger));
             return rootContext.Spawn(props);
         }
 

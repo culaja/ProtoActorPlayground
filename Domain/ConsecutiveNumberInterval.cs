@@ -4,6 +4,8 @@ namespace Domain
 {
     public struct ConsecutiveNumberInterval : IEquatable<ConsecutiveNumberInterval>, IComparable<ConsecutiveNumberInterval>
     {
+        public static ConsecutiveNumberInterval FromOneTo(long number) => NewFor(1, number);
+        
         public long Head { get; }
         
         public long Tail { get; }

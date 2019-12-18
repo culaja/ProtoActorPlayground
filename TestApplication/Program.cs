@@ -30,7 +30,8 @@ namespace TestApplication
                     1113,
                     "admin",
                     "changeit",
-                    "test"),
+                    "TestSnapshot",
+                    5),
                 new Uri("http://93.87.10.154:49448/DomainEventApplier"));
 
             var lastDispatchedDomainEvent = await domainEventApplier.ReadLastDispatchedDomainEvent();

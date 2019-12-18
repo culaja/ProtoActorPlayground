@@ -12,9 +12,11 @@
             ushort port,
             string userName,
             string password,
-            string streamsPrefix)
+            string snapshotName,
+            int eventNumberPersistTrigger)
         {
-            StreamsPrefix = streamsPrefix;
+            SnapshotName = snapshotName;
+            EventNumberPersistTrigger = eventNumberPersistTrigger;
             _hostName = hostName;
             _port = port;
             _userName = userName;
@@ -24,6 +26,7 @@
         public string ConnectionString =>
             $"ConnectTo=tcp://{_userName}:{_password}@{_hostName}:{_port}; DefaultUserCredentials={_userName}:{_password};";
 
-        public string StreamsPrefix { get; }
+        public string SnapshotName { get; }
+        public int EventNumberPersistTrigger { get; }
     }
 }
