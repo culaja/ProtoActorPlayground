@@ -13,7 +13,7 @@ namespace UnitTests
         [InlineData(0, 6, 0, 20, 0, 20)]
         [InlineData(4, 7, 7, 20, 4, 20)]
         [InlineData(0, 0, 0, 0, 0, 0)]
-        public void when_merging_is_possible_returns_correct_set(
+        public void when_merging_is_possible_returns_correct_interval(
             long head1,
             long tail1,
             long head2,
@@ -23,10 +23,10 @@ namespace UnitTests
         {
             var isMerged = ConsecutiveNumberInterval.NewFor(head1, tail1)
                 .TryMerge(ConsecutiveNumberInterval.NewFor(head2, tail2),
-                    out var mergedSet);
+                    out var mergedInterval);
 
             isMerged.Should().BeTrue();
-            mergedSet.Should().Be(ConsecutiveNumberInterval.NewFor(mergedHead, mergedTail));
+            mergedInterval.Should().Be(ConsecutiveNumberInterval.NewFor(mergedHead, mergedTail));
         }
         
         [Theory]

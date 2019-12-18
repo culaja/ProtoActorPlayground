@@ -15,18 +15,18 @@ namespace Domain
         
         public void MarkAsApplied(long eventNumber)
         {
-            var newSet = ConsecutiveNumberInterval.NewFor(eventNumber);
-            var insertPosition = FindInsertPositionFor(newSet);
+            var newInterval = ConsecutiveNumberInterval.NewFor(eventNumber);
+            var insertPosition = FindInsertPositionFor(newInterval);
             
-            _sortedConsecutiveNumberIntervals.Insert(insertPosition, newSet);
+            _sortedConsecutiveNumberIntervals.Insert(insertPosition, newInterval);
 
             TryMergeRightWithMiddle(insertPosition);
             TryMergeLeftWithMiddle(insertPosition);
         }
         
-        private int FindInsertPositionFor(ConsecutiveNumberInterval set)
+        private int FindInsertPositionFor(ConsecutiveNumberInterval interval)
         {
-            var binarySearchPosition = _sortedConsecutiveNumberIntervals.BinarySearch(set);
+            var binarySearchPosition = _sortedConsecutiveNumberIntervals.BinarySearch(interval);
             return binarySearchPosition >= 0 ? binarySearchPosition : ~binarySearchPosition;
         }
 
@@ -36,9 +36,9 @@ namespace Domain
             {
                 if (_sortedConsecutiveNumberIntervals[position].TryMerge(
                     _sortedConsecutiveNumberIntervals[position + 1],
-                    out var mergedSet))
+                    out var mergedInterval))
                 {
-                    _sortedConsecutiveNumberIntervals[position] = mergedSet;
+                    _sortedConsecutiveNumberIntervals[position] = mergedInterval;
                     _sortedConsecutiveNumberIntervals.RemoveAt(position + 1);
                 }
             }
