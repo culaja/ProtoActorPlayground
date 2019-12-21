@@ -18,11 +18,11 @@ namespace TestApplication
                 DomainEvent.Of(3, "Aggregate1", "{}", "{}"),
                 DomainEvent.Of(4, "Aggregate1", "{}", "{}"),
                 DomainEvent.Of(5, "Aggregate1", "{}", "{}"),
-                DomainEvent.Of(6, "Aggregate1", "{}", "{}"),
-                DomainEvent.Of(7, "Aggregate1", "{}", "{}"),
+                DomainEvent.Of(6, "Aggregate3", "{}", "{}"),
+                DomainEvent.Of(7, "Aggregate3", "{}", "{}"),
                 DomainEvent.Of(8, "Aggregate1", "{}", "{}"),
-                DomainEvent.Of(9, "Aggregate1", "{}", "{}"),
-                DomainEvent.Of(10, "Aggregate1", "{}", "{}")
+                DomainEvent.Of(9, "Aggregate5", "{}", "{}"),
+                DomainEvent.Of(10, "Aggregate5", "{}", "{}")
             };
 
             var domainEventApplier = await ProtoActorDomainEventApplierBuilder.BuildUsing(new EventStoreConfiguration(
@@ -32,7 +32,7 @@ namespace TestApplication
                     "changeit",
                     "TestSnapshot",
                     5),
-                new Uri("http://93.87.10.154:49448/DomainEventApplier"));
+                new Uri("https://webhook.site/e7944f51-5d8e-422a-b8b1-dd13ea08c284"));
 
             var lastDispatchedDomainEvent = await domainEventApplier.ReadLastDispatchedDomainEvent();
             foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))

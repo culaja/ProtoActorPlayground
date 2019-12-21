@@ -49,7 +49,7 @@ namespace ProtoActorAdapter
             EventStoreConfiguration configuration,
             ISnapshotStore snapshotStore)
         {
-            var props = Props.FromProducer(() => new AppliedEventsTrackerPersistentActor(
+            var props = Props.FromProducer(() => new EventMonitorActor(
                 snapshotStore,
                 configuration.SnapshotName,
                 configuration.EventNumberPersistTrigger));
