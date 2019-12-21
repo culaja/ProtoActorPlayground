@@ -1,6 +1,5 @@
 ﻿using Domain;
 using FluentAssertions;
-using FluentAssertions.Specialized;
 using Xunit;
 
 namespace UnitTests
