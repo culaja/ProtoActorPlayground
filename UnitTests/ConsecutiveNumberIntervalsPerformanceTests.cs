@@ -1,4 +1,6 @@
 ﻿using Domain;
+using FluentAssertions;
+using FluentAssertions.Specialized;
 using Xunit;
 
 namespace UnitTests
@@ -6,7 +8,7 @@ namespace UnitTests
     public sealed class ConsecutiveNumberIntervalsPerformanceTests
     {
         [Fact]
-        public void when_numbers_are_incrementing_by_one()
+        public void simulate_best_case_scenario()
         {
             var numberCount = 1000000;
             var intervals = ConsecutiveNumberIntervals.New();
@@ -15,10 +17,12 @@ namespace UnitTests
             {
                 intervals.Insert(i);
             }
+            
+            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
         }
 
         [Fact]
-        public void when_first_odd_numbers_are_inserted()
+        public void simulate_worst_case_scenario()
         {
             var numberCount = 1000000;
             var intervals = ConsecutiveNumberIntervals.New();
@@ -32,7 +36,36 @@ namespace UnitTests
             {
                 intervals.Insert(i);
             }
+
+            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
         }
-        
+
+        [Fact]
+        public void simulate_some_realistic_scenario()
+        {
+            var numberCount = 1000000;
+            var intervals = ConsecutiveNumberIntervals.New();
+            
+            for (long i = 0; i < numberCount; i += 1000)
+            {
+                for (long j = i + 1; j <= i + 1000; ++j)
+                {
+                    if (j % 10 != 0)
+                    {
+                        intervals.Insert(j);    
+                    }
+                }
+
+                for (long j = i + 1; j <= i + 1000; ++j)
+                {
+                    if (j % 10 == 0)
+                    {
+                        intervals.Insert(j);    
+                    }
+                }
+            }
+            
+            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
+        }
     }
 }
