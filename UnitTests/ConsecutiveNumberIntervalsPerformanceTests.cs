@@ -20,18 +20,18 @@ namespace UnitTests
             intervals.LargestConsecutiveNumber.Should().Be(numberCount);
         }
 
-        [Fact]
+        [Fact (Skip = "Test takes more than 3 minutes to execute.")]
         public void simulate_worst_case_scenario()
         {
             var numberCount = 1000000;
             var intervals = ConsecutiveNumberIntervals.New();
             
-            for (int i = 2; i <= numberCount / 2; i += 2)
+            for (int i = 2; i <= numberCount; i += 2)
             {
                 intervals.Insert(i);
             }
             
-            for (int i = 1; i <= numberCount / 2; i += 2)
+            for (int i = 1; i <= numberCount; i += 2)
             {
                 intervals.Insert(i);
             }
@@ -39,29 +39,23 @@ namespace UnitTests
             intervals.LargestConsecutiveNumber.Should().Be(numberCount);
         }
 
-        [Fact]
-        public void simulate_some_realistic_scenario()
+        [Theory]
+        [InlineData(1000000, 1000, 10)]
+        [InlineData(1000000, 100, 10)]
+        public void simulate_some_realistic_scenario(
+            long numberCount,
+            int windowSize,
+            int skipInterval)
         {
-            var numberCount = 1000000;
             var intervals = ConsecutiveNumberIntervals.New();
             
-            for (long i = 0; i < numberCount; i += 1000)
+            for (long i = 0; i < numberCount; i += windowSize)
             {
-                for (long j = i + 1; j <= i + 1000; ++j)
-                {
-                    if (j % 10 != 0)
-                    {
-                        intervals.Insert(j);    
-                    }
-                }
-
-                for (long j = i + 1; j <= i + 1000; ++j)
-                {
-                    if (j % 10 == 0)
-                    {
-                        intervals.Insert(j);    
-                    }
-                }
+                for (var j = i + 1; j <= i + windowSize; ++j)
+                    if (j % skipInterval != 0) intervals.Insert(j);
+                
+                for (var j = i + 1; j <= i + windowSize; ++j)
+                    if (j % skipInterval == 0) intervals.Insert(j);
             }
             
             intervals.LargestConsecutiveNumber.Should().Be(numberCount);
