@@ -32,7 +32,7 @@ namespace TestApplication
                     "changeit",
                     "TestSnapshot",
                     5),
-                new Uri("https://webhook.site/e7944f51-5d8e-422a-b8b1-dd13ea08c284"));
+                new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"));
 
             var lastDispatchedDomainEvent = await domainEventApplier.ReadLastDispatchedDomainEvent();
             foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))

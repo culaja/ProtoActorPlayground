@@ -17,19 +17,22 @@ namespace ProtoActorAdapter
         {
             var context = new RootContext();
 
-            var eventStore = await BuildEventStoreUsing(configuration);
+            var snapshotStore = await BuildEventStoreUsing(configuration);
 
             var applierEventTrackerActorPid = BuildAppliedEventsTrackerPersistentActorUsing(
                 context,
                 configuration,
-                eventStore);
+                snapshotStore);
             
             var rootActorPid = BuildRootActorUsing(
                 context,
                 applierEventTrackerActorPid,
                 domainEventDestinationUri);
             
-            return new DomainEventApplier(context, rootActorPid, applierEventTrackerActorPid);
+            return new DomainEventApplier(
+                new EventMonitorActorSnapshotReader(snapshotStore, configuration.SnapshotName), 
+                context,
+                rootActorPid);
         }
 
         private static async Task<ISnapshotStore> BuildEventStoreUsing(EventStoreConfiguration configuration)

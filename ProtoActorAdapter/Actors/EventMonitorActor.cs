@@ -30,9 +30,6 @@ namespace ProtoActorAdapter.Actors
             {
                 case Started _:
                     return _persistence.RecoverStateAsync();
-                case ReadLastRoutedEvent _:
-                    context.Respond(new LastRoutedDomainEvent(_consecutiveNumberIntervals.LargestConsecutiveNumber));
-                    break;
                 case DomainEventApplied message:
                     return HandleDomainEventApplied(context, message);
             }
