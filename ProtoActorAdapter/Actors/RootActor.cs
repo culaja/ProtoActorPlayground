@@ -48,7 +48,7 @@ namespace ProtoActorAdapter.Actors
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
             var props = Props.FromProducer(() => new AggregateEventApplierActor(_applierEventTrackerActorPid, _destinationUri));
-            var applierActor = context.Spawn(props);
+            var applierActor = context.SpawnNamed(props, aggregateId);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;
         }

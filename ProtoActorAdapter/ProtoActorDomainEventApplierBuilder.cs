@@ -6,6 +6,7 @@ using Proto;
 using Proto.Persistence;
 using Proto.Persistence.EventStore;
 using ProtoActorAdapter.Actors;
+using ProtoActorAdapter.Logging;
 
 namespace ProtoActorAdapter
 {
@@ -55,8 +56,11 @@ namespace ProtoActorAdapter
             var props = Props.FromProducer(() => new EventMonitorActor(
                 snapshotStore,
                 configuration.SnapshotName,
-                configuration.EventNumberPersistTrigger));
-            return rootContext.Spawn(props);
+                configuration.EventNumberPersistTrigger))
+                .WithReceiveMiddleware(ActorLoggingMiddleware.For(ConsoleLogger.New(), nameof(EventMonitorActor)).ReceiveHook)
+                .WithSenderMiddleware(ActorLoggingMiddleware.For(ConsoleLogger.New(), nameof(EventMonitorActor)).SendHook);
+            
+            return rootContext.SpawnNamed(props, nameof(EventMonitorActor));
         }
 
         private static PID BuildRootActorUsing(
@@ -66,9 +70,11 @@ namespace ProtoActorAdapter
         {
             var props = Props.FromProducer(() => new RootActor(
                 applierEventTrackerActorPid,
-                domainEventDestinationUri));
+                domainEventDestinationUri))
+                .WithReceiveMiddleware(ActorLoggingMiddleware.For(ConsoleLogger.New(), nameof(RootActor)).ReceiveHook)
+                .WithSenderMiddleware(ActorLoggingMiddleware.For(ConsoleLogger.New(), nameof(RootActor)).SendHook);
             
-            return rootContext.Spawn(props);
+            return rootContext.SpawnNamed(props, nameof(RootActor));
         }
     }
 }
