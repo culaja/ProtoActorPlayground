@@ -22,7 +22,7 @@ namespace ProtoActorAdapter.Logging
         {
             try
             {
-                _logger.Verbose($"{_actorId} received message from {envelope.Sender.Name()} with content: '{envelope.Message}'.");
+                _logger.Debug($"{_actorId} received message from {envelope.Sender.Name()} with content: '{envelope.Message}'.");
                 await next(context, envelope);
                 _logger.Verbose($"{_actorId} finished processing of message received from {envelope.Sender.Name()} with content: '{envelope.Message}'.");
             }
@@ -37,7 +37,7 @@ namespace ProtoActorAdapter.Logging
         {
             try
             {
-                _logger.Verbose($"{_actorId} sending a message to {target.Name()} with content: '{envelope.Message}'.");
+                _logger.Debug($"{_actorId} sending a message to {target.Name()} with content: '{envelope.Message}'.");
                 await next(context, target, envelope);
                 _logger.Verbose($"{_actorId} has sent the message to {target.Name()} with content: '{envelope.Message}'.");
             }
