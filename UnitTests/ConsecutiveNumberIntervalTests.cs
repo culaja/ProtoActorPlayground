@@ -13,6 +13,10 @@ namespace UnitTests
         [InlineData(0, 6, 0, 20, 0, 20)]
         [InlineData(4, 7, 7, 20, 4, 20)]
         [InlineData(0, 0, 0, 0, 0, 0)]
+        [InlineData(3, 3, 0, 3, 0, 3)]
+        [InlineData(6, 10, 0, 5, 0, 10)]
+        [InlineData(0, 20, 0, 6, 0, 20)]
+        [InlineData(7, 20, 4, 7, 4, 20)]
         public void when_merging_is_possible_returns_correct_interval(
             long head1,
             long tail1,
