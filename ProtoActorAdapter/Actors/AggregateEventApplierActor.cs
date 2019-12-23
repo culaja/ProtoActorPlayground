@@ -26,13 +26,13 @@ namespace ProtoActorAdapter.Actors
             {
                 case Started _:
                     break;
-                case EnqueueDomainEvent message:
+                case EnqueueDomainEventMessage message:
                     HandleEnqueueDomainEvent(context, message);
                     break;
-                case ApplyDomainEventFromQueue message:
+                case ApplyDomainEventFromQueueMessage message:
                     HandleApplyDomainEventFromQueue(context, message.DomainEvent);
                     break;
-                case DomainEventApplied message:
+                case DomainEventAppliedMessage message:
                     HandleDomainAppliedEvent(context, message);
                     break;
             }
@@ -40,10 +40,10 @@ namespace ProtoActorAdapter.Actors
             return CompletedTask;
         }
         
-        private void HandleEnqueueDomainEvent(IContext context, EnqueueDomainEvent message)
+        private void HandleEnqueueDomainEvent(IContext context, EnqueueDomainEventMessage message)
         {
             _queue.Enqueue(message.Event);
-            context.Send(context.Self, new ApplyDomainEventFromQueue(message.Event));
+            context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.Event));
         }
 
         private void HandleApplyDomainEventFromQueue(IContext context, DomainEvent @event)
@@ -54,23 +54,23 @@ namespace ProtoActorAdapter.Actors
                 {
                     if (await result)
                     {
-                        var message = new DomainEventApplied(@event);
+                        var message = new DomainEventAppliedMessage(@event);
                         context.Send(context.Self, message);
                         context.Send(_applierEventTrackerActorPid, message);
                     }
                     else
                     {
-                        context.Send(context.Self, new ApplyDomainEventFromQueue(@event));
+                        context.Send(context.Self, new ApplyDomainEventFromQueueMessage(@event));
                     }
                 });
             }
         }
 
-        private void HandleDomainAppliedEvent(IContext context, DomainEventApplied message)
+        private void HandleDomainAppliedEvent(IContext context, DomainEventAppliedMessage message)
         {
             var dequeuedEvent = _queue.Dequeue();
             if (dequeuedEvent != message.DomainEvent) throw new InvalidOperationException("Events are not the same");
-            if (_queue.Count > 0 ) context.Send(context.Self, new ApplyDomainEventFromQueue(_queue.Peek()));
+            if (_queue.Count > 0 ) context.Send(context.Self, new ApplyDomainEventFromQueueMessage(_queue.Peek()));
         }
     }
 }

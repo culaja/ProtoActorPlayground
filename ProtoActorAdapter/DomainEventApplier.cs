@@ -29,7 +29,7 @@ namespace ProtoActorAdapter
         
         public void Pass(DomainEvent @event)
         {
-            _rootContext.Send(_rootActorId, new RouteDomainEvent(@event));
+            _rootContext.Send(_rootActorId, new RouteDomainEventMessage(@event));
         }
 
         public void Dispose()

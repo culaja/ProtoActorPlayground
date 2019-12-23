@@ -30,14 +30,14 @@ namespace ProtoActorAdapter.Actors
             {
                 case Started _:
                     return _persistence.RecoverStateAsync();
-                case DomainEventApplied message:
+                case DomainEventAppliedMessage message:
                     return HandleDomainEventApplied(context, message);
             }
 
             return CompletedTask;
         }
 
-        private Task HandleDomainEventApplied(IContext context, DomainEventApplied message)
+        private Task HandleDomainEventApplied(IContext context, DomainEventAppliedMessage message)
         {
             IncrementReceivedEventCount();
             _consecutiveNumberIntervals.Insert(message.DomainEvent.Number);

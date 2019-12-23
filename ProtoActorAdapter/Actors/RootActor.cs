@@ -11,18 +11,18 @@ namespace ProtoActorAdapter.Actors
     
     internal sealed class RootActor : IActor
     {
-        private readonly PID _applierEventTrackerActorPid;
+        private readonly PID _eventMonitorActorPid;
         private readonly Uri _destinationUri;
         private readonly DecorateChildDelegate _decorateChild;
 
         private readonly Dictionary<string, PID> _appliersByAggregateId = new Dictionary<string, PID>();
 
         public RootActor(
-            PID applierEventTrackerActorPid,
+            PID eventMonitorActorPid,
             Uri destinationUri,
             DecorateChildDelegate decorateChild)
         {
-            _applierEventTrackerActorPid = applierEventTrackerActorPid;
+            _eventMonitorActorPid = eventMonitorActorPid;
             _destinationUri = destinationUri;
             _decorateChild = decorateChild;
         }
@@ -33,7 +33,7 @@ namespace ProtoActorAdapter.Actors
             {
                 case Started _:
                     break;
-                case RouteDomainEvent message:
+                case RouteDomainEventMessage message:
                     var applierActor = LocateChildActorForDomainEvent(context, message);
                     context.Send(applierActor, message.ToEnqueueDomainEvent());
                     break;
@@ -42,11 +42,11 @@ namespace ProtoActorAdapter.Actors
             return CompletedTask;
         }
 
-        private PID LocateChildActorForDomainEvent(IContext context, RouteDomainEvent domainEvent)
+        private PID LocateChildActorForDomainEvent(IContext context, RouteDomainEventMessage domainEventMessage)
         {
-            if (!_appliersByAggregateId.TryGetValue(domainEvent.ChildActorId(), out var applierActor))
+            if (!_appliersByAggregateId.TryGetValue(domainEventMessage.ChildActorId(), out var applierActor))
             {
-                applierActor = CreateAggregateEventApplierActorOf(context, domainEvent.ChildActorId());
+                applierActor = CreateAggregateEventApplierActorOf(context, domainEventMessage.ChildActorId());
             }
 
             return applierActor;
@@ -54,7 +54,7 @@ namespace ProtoActorAdapter.Actors
 
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
-            var props = Props.FromProducer(() => new AggregateEventApplierActor(_applierEventTrackerActorPid, _destinationUri));
+            var props = Props.FromProducer(() => new AggregateEventApplierActor(_eventMonitorActorPid, _destinationUri));
             var applierActor = context.SpawnNamed(_decorateChild(props, aggregateId), aggregateId);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;
