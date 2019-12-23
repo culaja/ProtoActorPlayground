@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Domain;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace HttpClientAdapter
 {
