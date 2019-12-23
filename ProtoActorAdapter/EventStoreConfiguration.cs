@@ -1,4 +1,6 @@
-﻿namespace ProtoActorAdapter
+﻿using System;
+
+namespace ProtoActorAdapter
 {
     public sealed class EventStoreConfiguration
     {
@@ -13,10 +15,10 @@
             string userName,
             string password,
             string snapshotName,
-            int eventNumberPersistTrigger)
+            TimeSpan snapshotTimeSpan)
         {
             SnapshotName = snapshotName;
-            EventNumberPersistTrigger = eventNumberPersistTrigger;
+            SnapshotTimeSpan = snapshotTimeSpan;
             _hostName = hostName;
             _port = port;
             _userName = userName;
@@ -27,6 +29,6 @@
             $"ConnectTo=tcp://{_userName}:{_password}@{_hostName}:{_port}; DefaultUserCredentials={_userName}:{_password};";
 
         public string SnapshotName { get; }
-        public int EventNumberPersistTrigger { get; }
+        public TimeSpan SnapshotTimeSpan { get; }
     }
 }

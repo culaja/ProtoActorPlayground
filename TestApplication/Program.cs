@@ -22,7 +22,7 @@ namespace TestApplication
                     "admin",
                     "changeit",
                     "TestSnapshot",
-                    5))
+                    TimeSpan.FromSeconds(10)))
                 .Targeting(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"))
                 .DecorateWith(ConsoleLogger.New())
                 .Build();

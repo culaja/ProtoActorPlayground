@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Domain;
 using Proto;
 using Proto.Persistence;
+using Proto.Schedulers.SimpleScheduler;
 using ProtoActorAdapter.Actors.Messages;
 using static System.Threading.Tasks.Task;
 
@@ -10,17 +11,19 @@ namespace ProtoActorAdapter.Actors
 {
     public sealed class EventMonitorActor : IActor
     {
-        private readonly int _snapshotLimit;
+        private readonly TimeSpan _snapshotTimeSpan;
+        
         private readonly Persistence _persistence;
+        private readonly ISimpleScheduler _scheduler = new SimpleScheduler();
         private readonly ConsecutiveNumberIntervals _consecutiveNumberIntervals = ConsecutiveNumberIntervals.StartFrom(0);
-        private long _receivedEventCount;
+        private long _lastSnapshottedDomainEventNumber;
 
         public EventMonitorActor(
             ISnapshotStore snapshotStore,
             string actorId,
-            int snapshotLimit)
+            TimeSpan snapshotTimeSpan)
         {
-            _snapshotLimit = snapshotLimit;
+            _snapshotTimeSpan = snapshotTimeSpan;
             _persistence = Persistence.WithSnapshotting(snapshotStore, actorId, ApplySnapshot);
         }
 
@@ -29,31 +32,44 @@ namespace ProtoActorAdapter.Actors
             switch (context.Message)
             {
                 case Started _:
-                    return _persistence.RecoverStateAsync();
+                    return HandleStarted(context);
                 case DomainEventAppliedMessage message:
-                    return HandleDomainEventApplied(context, message);
+                    HandleDomainEventApplied(context, message);
+                    break;
+                case TakeSnapshotOfAppliedDomainEventsMessage _:
+                    return HandleTakeSnapshotOfAppliedDomainEventsMessage();
             }
 
             return CompletedTask;
         }
 
-        private Task HandleDomainEventApplied(IContext context, DomainEventAppliedMessage message)
+        private Task HandleStarted(IContext context)
         {
-            IncrementReceivedEventCount();
+            _scheduler.ScheduleTellRepeatedly(
+                _snapshotTimeSpan,
+                _snapshotTimeSpan,
+                context.Self,
+                new TakeSnapshotOfAppliedDomainEventsMessage(),
+                out _);
+            return _persistence.RecoverStateAsync(); 
+        }
+
+        private void HandleDomainEventApplied(IContext context, DomainEventAppliedMessage message) => 
             _consecutiveNumberIntervals.Insert(message.DomainEvent.Number);
-            return PersistIfNeeded();
-        }
 
-        private void IncrementReceivedEventCount() => _receivedEventCount++;
+        private Task HandleTakeSnapshotOfAppliedDomainEventsMessage() =>
+            ShouldTakeSnapshot()
+                ? TakeSnapshot()
+                : CompletedTask;
 
-        private Task PersistIfNeeded()
+        private bool ShouldTakeSnapshot() => 
+            _lastSnapshottedDomainEventNumber != _consecutiveNumberIntervals.LargestConsecutiveNumber;
+
+        private Task TakeSnapshot()
         {
-            if (ShouldPersistSnapshot)
-                return _persistence.PersistSnapshotAsync(_consecutiveNumberIntervals.LargestConsecutiveNumber);
-            return CompletedTask;
+            _lastSnapshottedDomainEventNumber = _consecutiveNumberIntervals.LargestConsecutiveNumber;
+            return _persistence.PersistSnapshotAsync(_consecutiveNumberIntervals.LargestConsecutiveNumber);
         }
-
-        private bool ShouldPersistSnapshot => _receivedEventCount % _snapshotLimit == 0; 
 
         private void ApplySnapshot(Snapshot snapshot)
         {
