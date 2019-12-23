@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Domain;
 using Ports;
 using Proto;
@@ -9,24 +8,23 @@ namespace ProtoActorAdapter
 {
     public sealed class DomainEventApplier : IDomainEventApplier
     {
+        private readonly EventMonitorActorSnapshotReader _eventMonitorActorSnapshotReader;
         private readonly IRootContext _rootContext;
         private readonly PID _rootActorId;
-        private readonly PID _applierEventTrackerActorPid;
 
         internal DomainEventApplier(
+            EventMonitorActorSnapshotReader eventMonitorActorSnapshotReader,
             IRootContext rootContext,
-            PID rootActorId,
-            PID applierEventTrackerActorPid)
+            PID rootActorId)
         {
+            _eventMonitorActorSnapshotReader = eventMonitorActorSnapshotReader;
             _rootContext = rootContext;
             _rootActorId = rootActorId;
-            _applierEventTrackerActorPid = applierEventTrackerActorPid;
         }
 
-        public async Task<long> ReadLastDispatchedDomainEvent()
+        public Task<long> ReadLastDispatchedDomainEvent()
         {
-            var message = await _rootContext.RequestAsync<LastRoutedDomainEvent>(_applierEventTrackerActorPid,new ReadLastRoutedEvent());
-            return message.Value;
+            return _eventMonitorActorSnapshotReader.ReadLastSnapshot();
         }
         
         public void Pass(DomainEvent @event)

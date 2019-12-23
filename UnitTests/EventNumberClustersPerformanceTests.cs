@@ -17,25 +17,28 @@ namespace UnitTests
                 intervals.Insert(i);
                 var unused = intervals.LastAppliedEventNumber;
             }
+            intervals.LastAppliedEventNumber.Should().Be(numberCount);
         }
 
         [Fact]
-        public void when_first_odd_numbers_are_inserted()
+        public void when_first_even_numbers_are_inserted()
         {
             var numberCount = 1000000;
             var intervals = EventNumberClusters.New();
             
-            for (int i = 2; i <= numberCount / 2; i += 2)
+            for (int i = 2; i <= numberCount; i += 2)
             {
                 intervals.Insert(i);
                 var unused = intervals.LastAppliedEventNumber;
             }
             
-            for (int i = 1; i <= numberCount / 2; i += 2)
+            for (int i = 1; i <= numberCount; i += 2)
             {
                 intervals.Insert(i);
                 var unused = intervals.LastAppliedEventNumber;
             }
+            
+            intervals.LastAppliedEventNumber.Should().Be(numberCount);
         }
         
         [Theory]

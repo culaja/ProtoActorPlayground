@@ -13,7 +13,6 @@ namespace ProtoActorAdapter.Actors
         private readonly Uri _destinationUri;
         
         private readonly Dictionary<string, PID> _appliersByAggregateId = new Dictionary<string, PID>();
-        private long _lastRoutedEvent = -1;
 
         public RootActor(PID applierEventTrackerActorPid, Uri destinationUri)
         {
@@ -26,9 +25,6 @@ namespace ProtoActorAdapter.Actors
             switch (context.Message)
             {
                 case Started _:
-                    break;
-                case ReadLastRoutedEvent _:
-                    context.Respond(new LastRoutedDomainEvent(_lastRoutedEvent));
                     break;
                 case RouteDomainEvent message:
                     var applierActor = LocateChildActorForDomainEvent(context, message);
@@ -52,7 +48,7 @@ namespace ProtoActorAdapter.Actors
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
             var props = Props.FromProducer(() => new AggregateEventApplierActor(_applierEventTrackerActorPid, _destinationUri));
-            var applierActor = context.Spawn(props);
+            var applierActor = context.SpawnNamed(props, aggregateId);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;
         }
