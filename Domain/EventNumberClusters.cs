@@ -1,23 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Framework;
-using static Domain.EventNumber;
 
 namespace Domain
 {
     public class EventNumberClusters
     {
-        private readonly Dictionary<long, EventNumber> _eventNumbers = new Dictionary<long, EventNumber>();
-        private readonly Dictionary<EventNumber, long> _headsToLargestElementDictionary =
-            new Dictionary<EventNumber, long>();
+        private readonly Dictionary<long, long> _eventNumbersToParentsDictionary = new Dictionary<long, long>();
+        private readonly Dictionary<long, long> _headsToLargestElementDictionary =new Dictionary<long, long>();
 
         private EventNumberClusters(long startingPoint)
         {
-            var zero = NewEventNumber(0);
-            _headsToLargestElementDictionary[zero] = startingPoint;
-            _eventNumbers[0] = zero;
-            for (var i = 1; i <= startingPoint; i++) _eventNumbers[i] = NewEventNumber(i).AttachTo(zero);
+            _eventNumbersToParentsDictionary[0] = 0;
+            for (int i = 1; i <= startingPoint; i++) _eventNumbersToParentsDictionary[i] = 0;
+            _headsToLargestElementDictionary[0] = startingPoint;
             LastAppliedEventNumber = startingPoint;
         }
 
@@ -29,62 +24,85 @@ namespace Domain
 
         public void Insert(long number)
         {
-            Insert(NewEventNumber(number));
+            if (_eventNumbersToParentsDictionary.ContainsKey(number)) return;
+            _eventNumbersToParentsDictionary[number] = number;
+            DetermineMergingStrategy(number).Invoke(number);
         }
 
-        public void Insert(EventNumber eventNumber)
+        private Action<long> DetermineMergingStrategy(long eventNumber)
         {
-            if (_eventNumbers.ContainsKey(eventNumber.Value)) return;
-            _eventNumbers[eventNumber.Value] = eventNumber;
-            DetermineMergingStrategy(eventNumber).Invoke(eventNumber);
-        }
-
-        private Action<EventNumber> DetermineMergingStrategy(EventNumber eventNumber)
-        {
-            if (_eventNumbers.ContainsKey(eventNumber.OneLess()) && _eventNumbers.ContainsKey(eventNumber.OneMore()))
-                return MergeWithBothSides;
-            if (_eventNumbers.ContainsKey(eventNumber.OneLess()))
-                return MergeWithOneLess;
-            if (_eventNumbers.ContainsKey(eventNumber.OneMore()))
-                return MergeWithOneMore;
+            var oneLessExists = _eventNumbersToParentsDictionary.ContainsKey(eventNumber - 1);
+            var oneMoreExists = _eventNumbersToParentsDictionary.ContainsKey(eventNumber + 1);
+            if (oneLessExists && oneMoreExists) return MergeWithBothSides;
+            if (oneLessExists) return MergeWithOneLess;
+            if (oneMoreExists) return MergeWithOneMore;
             return DoNotMerge;
         }
 
-        private void MergeWithBothSides(EventNumber eventNumber)
+        private void MergeWithBothSides(long eventNumber)
         {
-            var oneLess = _eventNumbers[eventNumber.OneLess()];
-            var oneMore = _eventNumbers[eventNumber.OneMore()];
-            var largestElement = _headsToLargestElementDictionary[oneMore.Parent];
-            _headsToLargestElementDictionary.Remove(oneLess.Parent);
-            _headsToLargestElementDictionary.Remove(oneMore.Parent);
+            var oneLess = eventNumber - 1;
+            var oneMore = eventNumber + 1;
+            var largestElement = _headsToLargestElementDictionary[ParentOf(oneMore)];
+            _headsToLargestElementDictionary.Remove(ParentOf(oneLess));
+            _headsToLargestElementDictionary.Remove(ParentOf(oneMore));
             
-            var head = oneLess.Merge(oneMore);
-            head = head.Merge(eventNumber);
+            var head = Merge(oneLess, oneMore);
+            head = Merge(head, eventNumber);
             _headsToLargestElementDictionary[head] = largestElement;
-            if (LastAppliedEventNumber == oneLess.Value) LastAppliedEventNumber = largestElement;
+            
+            if (LastAppliedEventNumber == oneLess) LastAppliedEventNumber = largestElement;
         }
 
-        private void MergeWithOneLess(EventNumber eventNumber)
+        private void MergeWithOneLess(long eventNumber)
         {
-            var oneLess = _eventNumbers[eventNumber.OneLess()];
-            _headsToLargestElementDictionary.Remove(oneLess.Parent);
-            var head = eventNumber.Merge(oneLess);
-            _headsToLargestElementDictionary[head] = eventNumber.Value;
-            if (LastAppliedEventNumber == oneLess.Value) LastAppliedEventNumber = eventNumber.Value;
+            var oneLess = eventNumber - 1;
+            _headsToLargestElementDictionary.Remove(ParentOf(oneLess));
+            var head = Merge(eventNumber, oneLess);
+            _headsToLargestElementDictionary[head] = eventNumber;
+            if (LastAppliedEventNumber == oneLess) LastAppliedEventNumber = eventNumber;
         }
         
-        private void MergeWithOneMore(EventNumber eventNumber)
+        private void MergeWithOneMore(long eventNumber)
         {
-            var oneMore = _eventNumbers[eventNumber.OneMore()];
-            var largestElement = _headsToLargestElementDictionary[oneMore.Parent];
-            _headsToLargestElementDictionary.Remove(oneMore.Parent);
-            var head = eventNumber.Merge(oneMore);
+            var oneMore = eventNumber + 1;
+            var largestElement = _headsToLargestElementDictionary[ParentOf(oneMore)];
+            _headsToLargestElementDictionary.Remove(ParentOf(oneMore));
+            var head = Merge(eventNumber, oneMore);
             _headsToLargestElementDictionary[head] = largestElement;
         }
         
-        private void DoNotMerge(EventNumber eventNumber)
+        private void DoNotMerge(long eventNumber)
         {
-            _headsToLargestElementDictionary[eventNumber] = eventNumber.Value;
+            _headsToLargestElementDictionary[eventNumber] = eventNumber;
+        }
+
+        private long ParentOf(long eventNumber) => ParentAndClusterSizeOf(eventNumber).Item1;
+
+        private Tuple<long, long> ParentAndClusterSizeOf(long eventNumber)
+        {
+            var clusterSize = 1;
+            var parent = _eventNumbersToParentsDictionary[eventNumber];
+            while (eventNumber != parent)
+            {
+                clusterSize++;
+                eventNumber = parent;
+                parent = _eventNumbersToParentsDictionary[eventNumber];
+            }
+            return new Tuple<long, long>(parent, clusterSize);
+        }
+
+        private long Merge(long event1, long event2)
+        {
+            var (parent1, clusterSize1) = ParentAndClusterSizeOf(event1);
+            var (parent2, clusterSize2) = ParentAndClusterSizeOf(event2);
+            if (clusterSize1 < clusterSize2)
+            {
+                _eventNumbersToParentsDictionary[parent1] = parent2;
+                return parent2;
+            }
+            _eventNumbersToParentsDictionary[parent2] = parent1;
+            return parent1;
         }
     }
 }
