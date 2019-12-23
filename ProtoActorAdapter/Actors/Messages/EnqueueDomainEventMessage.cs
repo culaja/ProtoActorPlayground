@@ -4,11 +4,13 @@ namespace ProtoActorAdapter.Actors.Messages
 {
     internal sealed class EnqueueDomainEventMessage
     {
-        public DomainEvent Event { get; }
+        public DomainEvent DomainEvent { get; }
 
-        public EnqueueDomainEventMessage(DomainEvent @event)
+        public EnqueueDomainEventMessage(DomainEvent domainEvent)
         {
-            Event = @event;
+            DomainEvent = domainEvent;
         }
+        
+        public override string ToString() => $"{nameof(EnqueueDomainEventMessage)}: Event number: {DomainEvent.Number}.";
     }
 }

@@ -10,5 +10,7 @@ namespace ProtoActorAdapter.Actors.Messages
         {
             DomainEvent = domainEvent;
         }
+        
+        public override string ToString() => $"{nameof(DomainEventAppliedMessage)}: Event number: {DomainEvent.Number}.";
     }
 }

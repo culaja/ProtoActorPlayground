@@ -42,8 +42,8 @@ namespace ProtoActorAdapter.Actors
         
         private void HandleEnqueueDomainEvent(IContext context, EnqueueDomainEventMessage message)
         {
-            _queue.Enqueue(message.Event);
-            context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.Event));
+            _queue.Enqueue(message.DomainEvent);
+            context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.DomainEvent));
         }
 
         private void HandleApplyDomainEventFromQueue(IContext context, DomainEvent @event)

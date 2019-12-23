@@ -14,5 +14,7 @@ namespace ProtoActorAdapter.Actors.Messages
         public string ChildActorId() => _event.AggregateId;
         
         public EnqueueDomainEventMessage ToEnqueueDomainEvent() => new EnqueueDomainEventMessage(_event);
+        
+        public override string ToString() => $"{nameof(RouteDomainEventMessage)}: Event number: {_event}.";
     }
 }
