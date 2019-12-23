@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HttpClientAdapter\HttpClientAdapter.csproj" />
       <ProjectReference Include="..\ProtoActorAdapter\ProtoActorAdapter.csproj" />
     </ItemGroup>
 

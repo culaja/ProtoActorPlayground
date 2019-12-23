@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Proto;
 using ProtoActorAdapter.Actors.Messages;
@@ -12,18 +11,15 @@ namespace ProtoActorAdapter.Actors
     internal sealed class RootActor : IActor
     {
         private readonly PID _eventMonitorActorPid;
-        private readonly Uri _destinationUri;
         private readonly DecorateChildDelegate _decorateChild;
 
         private readonly Dictionary<string, PID> _appliersByAggregateId = new Dictionary<string, PID>();
 
         public RootActor(
             PID eventMonitorActorPid,
-            Uri destinationUri,
             DecorateChildDelegate decorateChild)
         {
             _eventMonitorActorPid = eventMonitorActorPid;
-            _destinationUri = destinationUri;
             _decorateChild = decorateChild;
         }
 
@@ -54,7 +50,7 @@ namespace ProtoActorAdapter.Actors
 
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
-            var props = Props.FromProducer(() => new AggregateEventApplierActor(_eventMonitorActorPid, _destinationUri));
+            var props = Props.FromProducer(() => new AggregateEventApplierActor(_eventMonitorActorPid));
             var applierActor = context.SpawnNamed(_decorateChild(props, aggregateId), aggregateId);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;

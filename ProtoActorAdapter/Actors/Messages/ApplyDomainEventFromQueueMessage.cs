@@ -4,9 +4,9 @@ namespace ProtoActorAdapter.Actors.Messages
 {
     internal sealed class ApplyDomainEventFromQueueMessage
     {
-        public DomainEvent DomainEvent { get; }
+        public IDomainEvent DomainEvent { get; }
 
-        public ApplyDomainEventFromQueueMessage(DomainEvent domainEvent)
+        public ApplyDomainEventFromQueueMessage(IDomainEvent domainEvent)
         {
             DomainEvent = domainEvent;
         }

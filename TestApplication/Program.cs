@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
+using HttpClientAdapter;
 using ProtoActorAdapter;
 using ProtoActorAdapter.Logging;
 
@@ -11,8 +12,16 @@ namespace TestApplication
     {
         static async Task Main(string[] args)
         {
+            var httpApplyDomainEventStrategy = new HttpApplyDomainEventStrategy(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"));
+            
             var eventsToSend = Enumerable.Range(1, 53)
-                .Select(i => DomainEvent.Of(i, $"Aggregate{i}", "{}", "{}"))
+                .Select(i => DomainEventBuilder.New()
+                    .WithNumber(i)
+                    .ForAggregate($"Aggregate{i}")
+                    .WithData("{}")
+                    .WithMetadata("{}")
+                    .Using(httpApplyDomainEventStrategy)
+                    .Build())
                 .ToList();
 
             var domainEventApplier = await ProtoActorDomainEventApplierBuilder.New()
@@ -23,7 +32,6 @@ namespace TestApplication
                     "changeit",
                     "TestSnapshot",
                     TimeSpan.FromSeconds(10)))
-                .Targeting(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"))
                 .DecorateWith(ConsoleLogger.New())
                 .Build();
 

@@ -8,6 +8,6 @@ namespace Ports
     {
         Task<long> ReadLastDispatchedDomainEvent();
         
-        void Pass(DomainEvent @event);
+        void Pass(IDomainEvent domainEvent);
     }
 }

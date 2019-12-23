@@ -15,7 +15,6 @@ namespace ProtoActorAdapter
     public sealed class ProtoActorDomainEventApplierBuilder
     {
         private Optional<EventStoreConfiguration> _optionalEventStoreConfiguration;
-        private Optional<Uri> _optionalDomainEventDestinationUri;
         private ILogger _logger = new NoLogger();
         
         public static ProtoActorDomainEventApplierBuilder New() => new ProtoActorDomainEventApplierBuilder();
@@ -23,12 +22,6 @@ namespace ProtoActorAdapter
         public ProtoActorDomainEventApplierBuilder Using(EventStoreConfiguration configuration)
         {
             _optionalEventStoreConfiguration = configuration;
-            return this;
-        }
-
-        public ProtoActorDomainEventApplierBuilder Targeting(Uri domainEventDestinationUri)
-        {
-            _optionalDomainEventDestinationUri = domainEventDestinationUri;
             return this;
         }
 
@@ -41,16 +34,13 @@ namespace ProtoActorAdapter
         public Task<IDomainEventApplier> Build()
         {
             if (_optionalEventStoreConfiguration.HasNoValue) throw new ArgumentException("Argument is not set.", nameof(_optionalEventStoreConfiguration));
-            if (_optionalDomainEventDestinationUri.HasNoValue) throw new ArgumentException("Argument is not set.", nameof(_optionalEventStoreConfiguration));
             return InternalBuild(
                 _optionalEventStoreConfiguration.Value,
-                _optionalDomainEventDestinationUri.Value,
                 _logger);
         }
 
         private static async Task<IDomainEventApplier> InternalBuild(
             EventStoreConfiguration configuration,
-            Uri domainEventDestinationUri,
             ILogger logger)
         {
             var context = new RootContext();
@@ -65,7 +55,6 @@ namespace ProtoActorAdapter
             var rootActorPid = BuildRootActorUsing(
                 context,
                 applierEventTrackerActorPid,
-                domainEventDestinationUri,
                 logger);
             
             return new DomainEventApplier(
@@ -105,12 +94,10 @@ namespace ProtoActorAdapter
         private static PID BuildRootActorUsing(
             RootContext rootContext, 
             PID applierEventTrackerActorPid,
-            Uri domainEventDestinationUri,
             ILogger logger)
         {
             var props = Props.FromProducer(() => new RootActor(
                 applierEventTrackerActorPid,
-                domainEventDestinationUri,
                 (childProps, childActorName) => DecorateWithLogger(logger, childProps, childActorName)));
             
             return rootContext.SpawnNamed(

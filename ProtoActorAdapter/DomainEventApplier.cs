@@ -27,7 +27,7 @@ namespace ProtoActorAdapter
             return _eventMonitorActorSnapshotReader.ReadLastSnapshot();
         }
         
-        public void Pass(DomainEvent @event)
+        public void Pass(IDomainEvent @event)
         {
             _rootContext.Send(_rootActorId, new RouteDomainEventMessage(@event));
         }

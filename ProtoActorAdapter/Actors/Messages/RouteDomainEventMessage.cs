@@ -4,9 +4,9 @@ namespace ProtoActorAdapter.Actors.Messages
 {
     internal sealed class RouteDomainEventMessage
     {
-        private readonly DomainEvent _event;
+        private readonly IDomainEvent _event;
 
-        public RouteDomainEventMessage(DomainEvent @event)
+        public RouteDomainEventMessage(IDomainEvent @event)
         {
             _event = @event;
         }

@@ -7,9 +7,9 @@ namespace EventStoreReaderTestApp
 {
     internal sealed class EventStoreReceiver : IEventStoreStreamMessageReceiver
     {
-        public void Receive(DomainEvent message)
+        public void Receive(DomainEventBuilder builder)
         {
-            Console.WriteLine(message);
+            Console.WriteLine(builder.Build());
         }
     }
 

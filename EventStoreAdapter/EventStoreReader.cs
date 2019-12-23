@@ -29,14 +29,14 @@ namespace EventStoreAdapter
             return new EventStoreSubscription(catchUpSubscription);
         }
 
-        private static DomainEvent Convert(ResolvedEvent resolvedEvent)
+        private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent)
         {
             var streamName = StreamName.Of(resolvedEvent.OriginalEvent.EventStreamId);
-            return DomainEvent.Of(
-                resolvedEvent.Event.EventNumber,
-                streamName,
-                Encoding.UTF8.GetString(resolvedEvent.Event.Data),
-                Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
+            return DomainEventBuilder.New()
+                .WithNumber(resolvedEvent.Event.EventNumber)
+                .ForAggregate(streamName)
+                .WithData(Encoding.UTF8.GetString(resolvedEvent.Event.Data))
+                .WithMetadata(Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
         }
     }
 }

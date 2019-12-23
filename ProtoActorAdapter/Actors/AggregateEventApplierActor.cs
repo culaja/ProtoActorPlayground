@@ -11,13 +11,11 @@ namespace ProtoActorAdapter.Actors
     internal sealed class AggregateEventApplierActor : IActor
     {
         private readonly PID _applierEventTrackerActorPid;
-        private readonly HttpDomainEventDispatcher _domainEventDispatcher;
-        private readonly Queue<DomainEvent> _queue = new Queue<DomainEvent>();
+        private readonly Queue<IDomainEvent> _queue = new Queue<IDomainEvent>();
 
-        public AggregateEventApplierActor(PID applierEventTrackerActorPid, Uri destinationUri)
+        public AggregateEventApplierActor(PID applierEventTrackerActorPid)
         {
             _applierEventTrackerActorPid = applierEventTrackerActorPid;
-            _domainEventDispatcher = new HttpDomainEventDispatcher(destinationUri);
         }
 
         public Task ReceiveAsync(IContext context)
@@ -46,11 +44,11 @@ namespace ProtoActorAdapter.Actors
             context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.DomainEvent));
         }
 
-        private void HandleApplyDomainEventFromQueue(IContext context, DomainEvent @event)
+        private void HandleApplyDomainEventFromQueue(IContext context, IDomainEvent @event)
         {
             if (_queue.TryPeek(out var peekedEvent) && peekedEvent == @event)
             {
-                context.ReenterAfter(_domainEventDispatcher.Dispatch(@event), async result =>
+                context.ReenterAfter(@event.TryApply(), async result =>
                 {
                     if (await result)
                     {
