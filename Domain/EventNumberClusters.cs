@@ -43,9 +43,10 @@ namespace Domain
         {
             var oneLess = eventNumber - 1;
             var oneMore = eventNumber + 1;
-            var largestElement = _headsToLargestElementDictionary[ParentOf(oneMore)];
+            var parentOfOneMore = ParentOf(oneMore);
+            var largestElement = _headsToLargestElementDictionary[parentOfOneMore];
             _headsToLargestElementDictionary.Remove(ParentOf(oneLess));
-            _headsToLargestElementDictionary.Remove(ParentOf(oneMore));
+            _headsToLargestElementDictionary.Remove(parentOfOneMore);
             
             var head = Merge(oneLess, oneMore);
             head = Merge(head, eventNumber);
@@ -66,8 +67,9 @@ namespace Domain
         private void MergeWithOneMore(long eventNumber)
         {
             var oneMore = eventNumber + 1;
-            var largestElement = _headsToLargestElementDictionary[ParentOf(oneMore)];
-            _headsToLargestElementDictionary.Remove(ParentOf(oneMore));
+            var parentOfOneMore = ParentOf(oneMore);
+            var largestElement = _headsToLargestElementDictionary[parentOfOneMore];
+            _headsToLargestElementDictionary.Remove(parentOfOneMore);
             var head = Merge(eventNumber, oneMore);
             _headsToLargestElementDictionary[head] = largestElement;
         }
