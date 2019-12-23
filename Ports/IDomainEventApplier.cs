@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Domain;
 
 namespace Ports
 {
-    public interface IDomainEventApplier
+    public interface IDomainEventApplier : IDisposable
     {
         Task<long> ReadLastDispatchedDomainEvent();
         

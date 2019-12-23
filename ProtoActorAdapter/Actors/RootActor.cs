@@ -7,17 +7,24 @@ using static System.Threading.Tasks.Task;
 
 namespace ProtoActorAdapter.Actors
 {
+    internal delegate Props DecorateChildDelegate(Props props, string actorName);
+    
     internal sealed class RootActor : IActor
     {
         private readonly PID _applierEventTrackerActorPid;
         private readonly Uri _destinationUri;
-        
+        private readonly DecorateChildDelegate _decorateChild;
+
         private readonly Dictionary<string, PID> _appliersByAggregateId = new Dictionary<string, PID>();
 
-        public RootActor(PID applierEventTrackerActorPid, Uri destinationUri)
+        public RootActor(
+            PID applierEventTrackerActorPid,
+            Uri destinationUri,
+            DecorateChildDelegate decorateChild)
         {
             _applierEventTrackerActorPid = applierEventTrackerActorPid;
             _destinationUri = destinationUri;
+            _decorateChild = decorateChild;
         }
 
         public Task ReceiveAsync(IContext context)
@@ -48,7 +55,7 @@ namespace ProtoActorAdapter.Actors
         private PID CreateAggregateEventApplierActorOf(IContext context, string aggregateId)
         {
             var props = Props.FromProducer(() => new AggregateEventApplierActor(_applierEventTrackerActorPid, _destinationUri));
-            var applierActor = context.SpawnNamed(props, aggregateId);
+            var applierActor = context.SpawnNamed(_decorateChild(props, aggregateId), aggregateId);
             _appliersByAggregateId.Add(aggregateId, applierActor);
             return applierActor;
         }

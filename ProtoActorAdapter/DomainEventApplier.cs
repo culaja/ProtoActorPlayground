@@ -31,5 +31,9 @@ namespace ProtoActorAdapter
         {
             _rootContext.Send(_rootActorId, new RouteDomainEvent(@event));
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

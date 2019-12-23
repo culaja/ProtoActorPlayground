@@ -3,7 +3,7 @@ using Ports;
 
 namespace ProtoActorAdapter.Logging
 {
-    internal sealed class ConsoleLogger : ILogger
+    public sealed class ConsoleLogger : ILogger
     {
         public static ILogger New() => new ConsoleLogger();
         
