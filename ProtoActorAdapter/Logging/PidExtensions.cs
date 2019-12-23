@@ -6,6 +6,6 @@ namespace ProtoActorAdapter.Logging
     {
         public static string Name(this PID pid) => pid != null
         ? pid.Id
-        : "OutsideActor";
+        : "Unknown";
     }
 }
