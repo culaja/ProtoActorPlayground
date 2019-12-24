@@ -77,6 +77,7 @@ namespace ProtoActorAdapter.Actors
             {
                 case long largestConsecutiveNumber:
                     _consecutiveNumberIntervals.Insert(ConsecutiveNumberInterval.FromOneTo(largestConsecutiveNumber));
+                    _lastSnapshottedDomainEventNumber = _consecutiveNumberIntervals.LargestConsecutiveNumber;
                     break;
                 default:
                     throw new NotSupportedException($"Snapshot not supported: '{snapshot.State}'");
