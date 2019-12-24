@@ -4,7 +4,7 @@ using Xunit;
 
 namespace UnitTests
 {
-    public sealed class EventNumberClustersTests
+    public sealed class EventNumbersUnionFindTests
     {
         [Theory]
         [InlineData(new long[] { }, 0)]
@@ -20,7 +20,7 @@ namespace UnitTests
             long[] domainEventNumbers,
             long lastConsecutiveAppliedEventNumber)
         {
-            var appliedDomainEvents = EventNumberClusters.New();
+            var appliedDomainEvents = EventNumbersUnionFind.New();
                 
             foreach (var number in domainEventNumbers) appliedDomainEvents.Insert(number);
 
