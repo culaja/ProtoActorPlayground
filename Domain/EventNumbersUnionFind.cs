@@ -5,8 +5,11 @@ namespace Domain
 {
     public class EventNumbersUnionFind
     {
+        private static readonly int _preferredDictionarySize = 1000000;
+        
         private readonly Dictionary<long, long> _eventNumbersToParentsDictionary = new Dictionary<long, long>();
         private readonly Dictionary<long, long> _headsToLargestElementDictionary =new Dictionary<long, long>();
+        private int _numberOfEventsAddedAfterLastCleanup; 
 
         private EventNumbersUnionFind(long startingPoint)
         {
@@ -14,6 +17,7 @@ namespace Domain
             for (int i = 1; i <= startingPoint; i++) _eventNumbersToParentsDictionary[i] = 0;
             _headsToLargestElementDictionary[0] = startingPoint;
             LastAppliedEventNumber = startingPoint;
+            _numberOfEventsAddedAfterLastCleanup = 1;
         }
 
         public static EventNumbersUnionFind StartFrom(long startingPoint) => new EventNumbersUnionFind(startingPoint);
@@ -36,7 +40,20 @@ namespace Domain
         private void InsertNewEvent(long number)
         {
             _eventNumbersToParentsDictionary[number] = number;
+            _numberOfEventsAddedAfterLastCleanup++;
             DetermineMergingStrategy(number).Invoke(number);
+            TryToCleanUp();
+        }
+
+        private void TryToCleanUp()
+        {
+            if (_numberOfEventsAddedAfterLastCleanup < _preferredDictionarySize) return;
+            
+            _headsToLargestElementDictionary.Remove(ParentOf(LastAppliedEventNumber));
+            _eventNumbersToParentsDictionary[LastAppliedEventNumber] = LastAppliedEventNumber;
+            _headsToLargestElementDictionary[LastAppliedEventNumber] = LastAppliedEventNumber;
+            for (var i = 0; i < LastAppliedEventNumber; i++) _eventNumbersToParentsDictionary.Remove(i);
+            _numberOfEventsAddedAfterLastCleanup = 0;
         }
 
         private Action<long> DetermineMergingStrategy(long eventNumber)
