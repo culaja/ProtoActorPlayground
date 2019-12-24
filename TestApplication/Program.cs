@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Domain;
 using HttpClientAdapter;
 using ProtoActorAdapter;
-using ProtoActorAdapter.Logging;
 
 namespace TestApplication
 {
@@ -12,7 +11,10 @@ namespace TestApplication
     {
         static async Task Main(string[] args)
         {
-            var httpApplyDomainEventStrategy = new HttpApplyDomainEventStrategy(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"));
+            var httpApplyDomainEventStrategy = HttpApplyDomainEventStrategyBuilder.New()
+                .WithDestinationUri(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"))
+                .DecorateWith(ConsoleLogger.New())
+                .Build();
             
             var eventsToSend = Enumerable.Range(1, 53)
                 .Select(i => DomainEventBuilder.New()

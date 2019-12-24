@@ -1,7 +1,7 @@
 ﻿using System;
 using Ports;
 
-namespace ProtoActorAdapter.Logging
+namespace TestApplication
 {
     public sealed class ConsoleLogger : ILogger
     {

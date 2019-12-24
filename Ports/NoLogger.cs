@@ -1,9 +1,8 @@
 ﻿using System;
-using Ports;
 
-namespace ProtoActorAdapter.Logging
+namespace Ports
 {
-    internal sealed class NoLogger : ILogger
+    public sealed class NoLogger : ILogger
     {
         public void Verbose(string message)
         {

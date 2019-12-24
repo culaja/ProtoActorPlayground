@@ -6,7 +6,7 @@ using Domain;
 
 namespace HttpClientAdapter
 {
-    public sealed class HttpApplyDomainEventStrategy : IApplyDomainEventStrategy
+    internal sealed class HttpApplyDomainEventStrategy : IApplyDomainEventStrategy
     {
         private static readonly HttpClient HttpClient = new HttpClient();
         
