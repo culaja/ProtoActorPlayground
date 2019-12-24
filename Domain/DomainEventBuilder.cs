@@ -6,8 +6,9 @@ namespace Domain
 {
     public sealed partial class DomainEventBuilder
     {
-        private Optional<long> _optionalNumber;
+        private long? _optionalNumber;
         private Optional<string> _optionalAggregateId;
+        private long? _optionalAggregateVersion;
         private Optional<string> _optionalData;
         private Optional<string> _optionalMetadata;
         private IApplyDomainEventStrategy _applyDomainEventStrategy = new AlwaysSuccessApplyDomainEventStrategy();
@@ -23,6 +24,12 @@ namespace Domain
         public DomainEventBuilder ForAggregate(string aggregateId)
         {
             _optionalAggregateId = aggregateId;
+            return this;
+        }
+
+        public DomainEventBuilder WithAggregateVersion(long aggregateVersion)
+        {
+            _optionalAggregateVersion = aggregateVersion;
             return this;
         }
 
@@ -46,13 +53,15 @@ namespace Domain
 
         public IDomainEvent Build()
         {
-            if (_optionalNumber.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalNumber));
+            if (!_optionalNumber.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalNumber));
             if (_optionalAggregateId.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalAggregateId));
+            if (!_optionalAggregateVersion.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalAggregateId));
             if (_optionalData.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalData));
             if (_optionalMetadata.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalMetadata));
             return new DomainEvent(
                 _optionalNumber.Value,
                 _optionalAggregateId.Value,
+                _optionalAggregateVersion.Value,
                 _optionalData.Value,
                 _optionalMetadata.Value,
                 _applyDomainEventStrategy);

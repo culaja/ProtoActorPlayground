@@ -35,6 +35,7 @@ namespace EventStoreAdapter
             return DomainEventBuilder.New()
                 .WithNumber(resolvedEvent.Event.EventNumber)
                 .ForAggregate(streamName)
+                .WithAggregateVersion(resolvedEvent.OriginalEventNumber)
                 .WithData(Encoding.UTF8.GetString(resolvedEvent.Event.Data))
                 .WithMetadata(Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
         }

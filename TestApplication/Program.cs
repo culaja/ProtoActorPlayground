@@ -18,6 +18,7 @@ namespace TestApplication
                 .Select(i => DomainEventBuilder.New()
                     .WithNumber(i)
                     .ForAggregate($"Aggregate{i}")
+                    .WithAggregateVersion(i)
                     .WithData("{}")
                     .WithMetadata("{}")
                     .Using(httpApplyDomainEventStrategy)
