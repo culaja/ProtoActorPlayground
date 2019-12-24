@@ -3,30 +3,57 @@ using System.Collections.Generic;
 
 namespace Domain
 {
-    public class EventNumberClusters
+    public class EventNumbersUnionFind
     {
+        private static readonly int _preferredDictionarySize = 1000000;
+        
         private readonly Dictionary<long, long> _eventNumbersToParentsDictionary = new Dictionary<long, long>();
         private readonly Dictionary<long, long> _headsToLargestElementDictionary =new Dictionary<long, long>();
+        private int _numberOfEventsAddedAfterLastCleanup; 
 
-        private EventNumberClusters(long startingPoint)
+        private EventNumbersUnionFind(long startingPoint)
         {
             _eventNumbersToParentsDictionary[0] = 0;
             for (int i = 1; i <= startingPoint; i++) _eventNumbersToParentsDictionary[i] = 0;
             _headsToLargestElementDictionary[0] = startingPoint;
             LastAppliedEventNumber = startingPoint;
+            _numberOfEventsAddedAfterLastCleanup = 1;
         }
 
-        public static EventNumberClusters StartFrom(long startingPoint) => new EventNumberClusters(startingPoint);
+        public static EventNumbersUnionFind StartFrom(long startingPoint) => new EventNumbersUnionFind(startingPoint);
 
-        public static EventNumberClusters New() => new EventNumberClusters(0);
+        public static EventNumbersUnionFind New() => new EventNumbersUnionFind(0);
 
         public long LastAppliedEventNumber { get; private set; }
 
         public void Insert(long number)
         {
-            if (_eventNumbersToParentsDictionary.ContainsKey(number)) return;
+            CheckThatEventIsNew(number, InsertNewEvent);
+        }
+
+        private void CheckThatEventIsNew(long number, Action<long> ifNew)
+        {
+            var eventIsNew = number > LastAppliedEventNumber && !_eventNumbersToParentsDictionary.ContainsKey(number);
+            if (eventIsNew) ifNew(number);
+        }
+
+        private void InsertNewEvent(long number)
+        {
             _eventNumbersToParentsDictionary[number] = number;
+            _numberOfEventsAddedAfterLastCleanup++;
             DetermineMergingStrategy(number).Invoke(number);
+            TryToCleanUp();
+        }
+
+        private void TryToCleanUp()
+        {
+            if (_numberOfEventsAddedAfterLastCleanup < _preferredDictionarySize) return;
+            
+            _headsToLargestElementDictionary.Remove(ParentOf(LastAppliedEventNumber));
+            _eventNumbersToParentsDictionary[LastAppliedEventNumber] = LastAppliedEventNumber;
+            _headsToLargestElementDictionary[LastAppliedEventNumber] = LastAppliedEventNumber;
+            for (var i = 0; i < LastAppliedEventNumber; i++) _eventNumbersToParentsDictionary.Remove(i);
+            _numberOfEventsAddedAfterLastCleanup = 0;
         }
 
         private Action<long> DetermineMergingStrategy(long eventNumber)

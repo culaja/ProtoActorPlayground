@@ -4,13 +4,13 @@ using Xunit;
 
 namespace UnitTests
 {
-    public sealed class EventNumberClustersPerformanceTests
+    public sealed class EventNumbersUnionFindPerformanceTests
     {
         [Fact]
         public void when_numbers_are_incrementing_by_one()
         {
             var numberCount = 1000000;
-            var intervals = EventNumberClusters.New();
+            var intervals = EventNumbersUnionFind.New();
             
             for (int i = 1; i <= numberCount; ++i)
             {
@@ -24,7 +24,7 @@ namespace UnitTests
         public void when_first_even_numbers_are_inserted()
         {
             var numberCount = 1000000;
-            var intervals = EventNumberClusters.New();
+            var intervals = EventNumbersUnionFind.New();
             
             for (int i = 2; i <= numberCount; i += 2)
             {
@@ -49,7 +49,7 @@ namespace UnitTests
             int windowSize,
             int skipInterval)
         {
-            var intervals = EventNumberClusters.New();
+            var intervals = EventNumbersUnionFind.New();
             for (long i = 0; i < numberCount; i += windowSize)
             {
                 for (var j = i + 1; j <= i + windowSize; ++j)
