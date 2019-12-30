@@ -14,6 +14,7 @@ namespace WorkerService
                 .RegisterEventStoreAdapterUsing(configuration)
                 .RegisterSourceStreamNameUsing(configuration)
                 .RegisterProtoActorAdapterUsing(configuration)
+                .RegisterHttpClientAdapterUsing(configuration)
                 .AddHostedService<Worker>();
 
         private static IServiceCollection RegisterLogger(this IServiceCollection service, IConfiguration configuration)
