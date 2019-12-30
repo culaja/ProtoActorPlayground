@@ -6,7 +6,7 @@ namespace Domain
     {
         long Number { get; }
         
-        string AggregateId { get; }
+        string TopicName { get; }
 
         Task<bool> TryApply();
 

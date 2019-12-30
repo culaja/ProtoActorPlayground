@@ -11,7 +11,7 @@ namespace ProtoActorAdapter.Actors.Messages
             _event = @event;
         }
 
-        public string ChildActorId() => _event.AggregateId;
+        public string ChildActorId() => _event.TopicName;
         
         public EnqueueDomainEventMessage ToEnqueueDomainEvent() => new EnqueueDomainEventMessage(_event);
         
