@@ -8,10 +8,12 @@ namespace WorkerService
     {
         private readonly ILogger<Worker> _logger;
 
-        public Logger(ILogger<Worker> logger)
+        private Logger(ILogger<Worker> logger)
         {
             _logger = logger;
         }
+        
+        public static IInternalLogger NewUsing(ILogger<Worker> logger) => new Logger(logger);
         
         public void Verbose(string message)
         {
