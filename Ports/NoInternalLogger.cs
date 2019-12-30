@@ -2,7 +2,7 @@
 
 namespace Ports
 {
-    public sealed class NoLogger : ILogger
+    public sealed class NoInternalLogger : IInternalLogger
     {
         public void Verbose(string message)
         {

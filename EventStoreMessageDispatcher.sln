@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoActorAdapter", "ProtoA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientAdapter", "HttpClientAdapter\HttpClientAdapter.csproj", "{FF78EC01-C8BF-4917-9BB8-D9AC127A2C14}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerService", "WorkerService\WorkerService.csproj", "{CE341BF0-0A46-4291-A45D-9514ACDBB644}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,9 +64,14 @@ Global
 		{FF78EC01-C8BF-4917-9BB8-D9AC127A2C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF78EC01-C8BF-4917-9BB8-D9AC127A2C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF78EC01-C8BF-4917-9BB8-D9AC127A2C14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE341BF0-0A46-4291-A45D-9514ACDBB644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE341BF0-0A46-4291-A45D-9514ACDBB644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE341BF0-0A46-4291-A45D-9514ACDBB644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE341BF0-0A46-4291-A45D-9514ACDBB644}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2DEFED52-1D02-4B3D-8A80-87470678014E} = {2C0CDAD4-60DB-45C0-BACB-FF72822F8CAC}
 		{D7AFA97B-8773-455D-965C-2C6FCF6EC7B2} = {2C0CDAD4-60DB-45C0-BACB-FF72822F8CAC}
+		{5E467D9A-0F19-4D02-9909-AB6F8C955405} = {2C0CDAD4-60DB-45C0-BACB-FF72822F8CAC}
 	EndGlobalSection
 EndGlobal

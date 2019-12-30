@@ -11,10 +11,12 @@ namespace EventStoreAdapter
     {
         private readonly string _connectionString;
 
-        public EventStoreReader(string connectionString)
+        private EventStoreReader(string connectionString)
         {
             _connectionString = connectionString;
         }
+
+        public static IEventStoreReader BuildUsing(string connectionString) => new EventStoreReader(connectionString);
         
         public IEventStoreSubscription SubscribeTo(StreamName streamName, IEventStoreStreamMessageReceiver receiver)
         {

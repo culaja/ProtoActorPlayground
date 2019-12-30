@@ -6,7 +6,7 @@ using ProtoActorAdapter.Actors.Messages;
 
 namespace ProtoActorAdapter
 {
-    public sealed class DomainEventApplier : IDomainEventApplier
+    internal sealed class DomainEventApplier : IDomainEventApplier
     {
         private readonly EventMonitorActorSnapshotReader _eventMonitorActorSnapshotReader;
         private readonly IRootContext _rootContext;

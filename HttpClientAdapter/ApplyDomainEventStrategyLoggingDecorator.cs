@@ -8,12 +8,12 @@ namespace HttpClientAdapter
 {
     internal sealed class ApplyDomainEventStrategyLoggingDecorator : IApplyDomainEventStrategy
     {
-        private readonly ILogger _logger;
+        private readonly IInternalLogger _internalLogger;
         private readonly IApplyDomainEventStrategy _next;
 
-        public ApplyDomainEventStrategyLoggingDecorator(ILogger logger, IApplyDomainEventStrategy next)
+        public ApplyDomainEventStrategyLoggingDecorator(IInternalLogger internalLogger, IApplyDomainEventStrategy next)
         {
-            _logger = logger;
+            _internalLogger = internalLogger;
             _next = next;
         }
 
@@ -21,14 +21,14 @@ namespace HttpClientAdapter
         {
             try
             {
-                _logger.Verbose($"Applying domain event with number {domainEvent.Number} ...");
+                _internalLogger.Verbose($"Applying domain event with number {domainEvent.Number} ...");
                 var result = await _next.TryApply(domainEvent);
-                _logger.Verbose($"Domain event with number {domainEvent.Number} applied");
+                _internalLogger.Verbose($"Domain event with number {domainEvent.Number} applied");
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error($"{_next.GetType().Name} didn't handle exception during applying domain event with number {domainEvent.Number}", ex);
+                _internalLogger.Error($"{_next.GetType().Name} didn't handle exception during applying domain event with number {domainEvent.Number}", ex);
                 throw;
             }
         }

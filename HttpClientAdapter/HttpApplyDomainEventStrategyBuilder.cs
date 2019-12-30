@@ -8,7 +8,7 @@ namespace HttpClientAdapter
     public sealed class HttpApplyDomainEventStrategyBuilder
     {
         private Optional<Uri> _optionalDestinationUri;
-        private ILogger _logger = new NoLogger();
+        private IInternalLogger _internalLogger = new NoInternalLogger();
         
         public static HttpApplyDomainEventStrategyBuilder New() => new HttpApplyDomainEventStrategyBuilder();
         
@@ -18,9 +18,9 @@ namespace HttpClientAdapter
             return this;
         }
 
-        public HttpApplyDomainEventStrategyBuilder DecorateWith(ILogger logger)
+        public HttpApplyDomainEventStrategyBuilder DecorateWith(IInternalLogger internalLogger)
         {
-            _logger = logger;
+            _internalLogger = internalLogger;
             return this;
         }
 
@@ -28,7 +28,7 @@ namespace HttpClientAdapter
         {
             if (_optionalDestinationUri.HasNoValue) throw new ArgumentException("Argument is not set.", nameof(_optionalDestinationUri));
             return new ApplyDomainEventStrategyLoggingDecorator(
-                _logger,
+                _internalLogger,
                 new HttpApplyDomainEventStrategy(_optionalDestinationUri.Value));
         }
     }

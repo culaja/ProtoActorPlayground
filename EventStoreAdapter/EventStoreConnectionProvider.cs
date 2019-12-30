@@ -6,7 +6,7 @@ using static Framework.Optional<EventStore.ClientAPI.IEventStoreConnection>;
 
 namespace EventStoreAdapter
 {
-    public static class EventStoreConnectionProvider
+    internal static class EventStoreConnectionProvider
     {
         private static readonly object SyncObject = new object();
         private static Optional<IEventStoreConnection> _eventStoreConnectionInstance = None;

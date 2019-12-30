@@ -3,9 +3,9 @@ using Ports;
 
 namespace TestApplication
 {
-    public sealed class ConsoleLogger : ILogger
+    public sealed class ConsoleInternalLogger : IInternalLogger
     {
-        public static ILogger New() => new ConsoleLogger();
+        public static IInternalLogger New() => new ConsoleInternalLogger();
         
         public void Verbose(string message)
         {

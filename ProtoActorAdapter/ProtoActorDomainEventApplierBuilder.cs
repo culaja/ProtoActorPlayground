@@ -8,54 +8,53 @@ using Proto.Persistence;
 using Proto.Persistence.EventStore;
 using ProtoActorAdapter.Actors;
 using ProtoActorAdapter.Logging;
-using ILogger = Ports.ILogger;
 
 namespace ProtoActorAdapter
 {
     public sealed class ProtoActorDomainEventApplierBuilder
     {
-        private Optional<EventStoreConfiguration> _optionalEventStoreConfiguration;
-        private ILogger _logger = new NoLogger();
+        private Optional<SnapshotConfiguration> _optionalEventStoreConfiguration;
+        private IInternalLogger _internalLogger = new NoInternalLogger();
         
         public static ProtoActorDomainEventApplierBuilder New() => new ProtoActorDomainEventApplierBuilder();
 
-        public ProtoActorDomainEventApplierBuilder Using(EventStoreConfiguration configuration)
+        public ProtoActorDomainEventApplierBuilder Using(SnapshotConfiguration configuration)
         {
             _optionalEventStoreConfiguration = configuration;
             return this;
         }
 
-        public ProtoActorDomainEventApplierBuilder DecorateWith(ILogger logger)
+        public ProtoActorDomainEventApplierBuilder DecorateWith(IInternalLogger internalLogger)
         {
-            _logger = logger;
+            _internalLogger = internalLogger;
             return this;
         }
 
-        public Task<IDomainEventApplier> Build()
+        public IDomainEventApplier Build()
         {
             if (_optionalEventStoreConfiguration.HasNoValue) throw new ArgumentException("Argument is not set.", nameof(_optionalEventStoreConfiguration));
             return InternalBuild(
                 _optionalEventStoreConfiguration.Value,
-                _logger);
+                _internalLogger);
         }
 
-        private static async Task<IDomainEventApplier> InternalBuild(
-            EventStoreConfiguration configuration,
-            ILogger logger)
+        private static IDomainEventApplier InternalBuild(
+            SnapshotConfiguration configuration,
+            IInternalLogger internalLogger)
         {
             var context = new RootContext();
-            var snapshotStore = await BuildEventStoreUsing(configuration);
+            var snapshotStore = BuildEventStoreUsing(configuration);
             
             var applierEventTrackerActorPid = BuildAppliedEventsTrackerPersistentActorUsing(
                 context,
                 configuration,
                 snapshotStore,
-                logger);
+                internalLogger);
             
             var rootActorPid = BuildRootActorUsing(
                 context,
                 applierEventTrackerActorPid,
-                logger);
+                internalLogger);
             
             return new DomainEventApplier(
                 new EventMonitorActorSnapshotReader(snapshotStore, configuration.SnapshotName), 
@@ -63,23 +62,23 @@ namespace ProtoActorAdapter
                 rootActorPid);
         }
 
-        private static async Task<ISnapshotStore> BuildEventStoreUsing(EventStoreConfiguration configuration)
+        private static ISnapshotStore BuildEventStoreUsing(SnapshotConfiguration configuration)
         {
             var eventStoreConnection = EventStoreConnection.Create(
                 configuration.ConnectionString,
                 ConnectionSettings.Create().KeepReconnecting(),
                 "DomainEventApplier");
             
-            await eventStoreConnection.ConnectAsync();
+            eventStoreConnection.ConnectAsync().Wait();
             
             return new EventStoreProvider(eventStoreConnection);
         }
 
         private static PID BuildAppliedEventsTrackerPersistentActorUsing(
             RootContext rootContext,
-            EventStoreConfiguration configuration,
+            SnapshotConfiguration configuration,
             ISnapshotStore snapshotStore,
-            ILogger logger)
+            IInternalLogger internalLogger)
         {
             var props = Props.FromProducer(() => new EventMonitorActor(
                 snapshotStore,
@@ -87,26 +86,26 @@ namespace ProtoActorAdapter
                 configuration.SnapshotTimeSpan));
             
             return rootContext.SpawnNamed(
-                DecorateWithLogger(logger, props, nameof(EventMonitorActor)),
+                DecorateWithLogger(internalLogger, props, nameof(EventMonitorActor)),
                 nameof(EventMonitorActor));
         }
 
         private static PID BuildRootActorUsing(
             RootContext rootContext, 
             PID applierEventTrackerActorPid,
-            ILogger logger)
+            IInternalLogger internalLogger)
         {
             var props = Props.FromProducer(() => new RootActor(
                 applierEventTrackerActorPid,
-                (childProps, childActorName) => DecorateWithLogger(logger, childProps, childActorName)));
+                (childProps, childActorName) => DecorateWithLogger(internalLogger, childProps, childActorName)));
             
             return rootContext.SpawnNamed(
-                DecorateWithLogger(logger, props, nameof(RootActor)),
+                DecorateWithLogger(internalLogger, props, nameof(RootActor)),
                 nameof(RootActor));
         }
 
-        private static Props DecorateWithLogger(ILogger logger, Props props, string actorName) => props
-            .WithReceiveMiddleware(ActorLoggingMiddleware.For(logger, actorName).ReceiveHook)
-            .WithSenderMiddleware(ActorLoggingMiddleware.For(logger, actorName).SendHook);
+        private static Props DecorateWithLogger(IInternalLogger internalLogger, Props props, string actorName) => props
+            .WithReceiveMiddleware(ActorLoggingMiddleware.For(internalLogger, actorName).ReceiveHook)
+            .WithSenderMiddleware(ActorLoggingMiddleware.For(internalLogger, actorName).SendHook);
     }
 }

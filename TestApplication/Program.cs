@@ -13,7 +13,7 @@ namespace TestApplication
         {
             var httpApplyDomainEventStrategy = HttpApplyDomainEventStrategyBuilder.New()
                 .WithDestinationUri(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"))
-                .DecorateWith(ConsoleLogger.New())
+                .DecorateWith(ConsoleInternalLogger.New())
                 .Build();
             
             var eventsToSend = Enumerable.Range(1, 53)
@@ -27,15 +27,12 @@ namespace TestApplication
                     .Build())
                 .ToList();
 
-            var domainEventApplier = await ProtoActorDomainEventApplierBuilder.New()
-                .Using(new EventStoreConfiguration(
-                    "localhost",
-                    1113,
-                    "admin",
-                    "changeit",
+            var domainEventApplier = ProtoActorDomainEventApplierBuilder.New()
+                .Using(new SnapshotConfiguration(
+                    "ConnectTo=tcp://admin:changeit@localhost:1113; DefaultUserCredentials=admin:changeit",
                     "TestSnapshot",
                     TimeSpan.FromSeconds(10)))
-                .DecorateWith(ConsoleLogger.New())
+                .DecorateWith(ConsoleInternalLogger.New())
                 .Build();
 
             var lastDispatchedDomainEvent = await domainEventApplier.ReadLastDispatchedDomainEvent();
