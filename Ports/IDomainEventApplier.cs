@@ -6,7 +6,7 @@ namespace Ports
 {
     public interface IDomainEventApplier : IDisposable
     {
-        Task<long> ReadLastDispatchedDomainEvent();
+        Task<long> ReadLastKnownDispatchedDomainEventNumber();
         
         void Pass(IDomainEvent domainEvent);
     }

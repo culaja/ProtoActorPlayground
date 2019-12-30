@@ -35,7 +35,7 @@ namespace TestApplication
                 .DecorateWith(ConsoleInternalLogger.New())
                 .Build();
 
-            var lastDispatchedDomainEvent = await domainEventApplier.ReadLastDispatchedDomainEvent();
+            var lastDispatchedDomainEvent = await domainEventApplier.ReadLastKnownDispatchedDomainEventNumber();
             foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))
             {
                 domainEventApplier.Pass(domainEvent);

@@ -19,13 +19,16 @@ namespace EventStoreAdapter
 
         public static IEventStoreReader BuildUsing(Uri connectionString) => new EventStoreReader(connectionString);
         
-        public IEventStoreSubscription SubscribeTo(StreamName streamName, IEventStoreStreamMessageReceiver receiver)
+        public IEventStoreSubscription SubscribeTo(
+            StreamName streamName,
+            long startPosition,
+            IEventStoreStreamMessageReceiver receiver)
         {
             var connection = GrabSingleEventStoreConnectionFor(_connectionString).Result;
 
             var catchUpSubscription = connection.SubscribeToStreamFrom(
                 streamName,
-                null,
+                startPosition == -1 ? null : (long?)startPosition,
                 CatchUpSubscriptionSettings.Default,
                 (_, x) => receiver.Receive(Convert(x)));
             
@@ -34,11 +37,11 @@ namespace EventStoreAdapter
 
         private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent)
         {
-            var streamName = StreamName.Of(resolvedEvent.OriginalEvent.EventStreamId);
+            var streamName = StreamName.Of(resolvedEvent.Event.EventStreamId);
             return DomainEventBuilder.New()
-                .WithNumber(resolvedEvent.Event.EventNumber)
+                .WithNumber(resolvedEvent.OriginalEventNumber)
                 .ForAggregate(streamName)
-                .WithAggregateVersion(resolvedEvent.OriginalEventNumber)
+                .WithAggregateVersion(resolvedEvent.Event.EventNumber)
                 .WithData(Encoding.UTF8.GetString(resolvedEvent.Event.Data))
                 .WithMetadata(Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
         }

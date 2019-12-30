@@ -22,7 +22,7 @@ namespace ProtoActorAdapter
             _rootActorId = rootActorId;
         }
 
-        public Task<long> ReadLastDispatchedDomainEvent()
+        public Task<long> ReadLastKnownDispatchedDomainEventNumber()
         {
             return _eventMonitorActorSnapshotReader.ReadLastSnapshot();
         }

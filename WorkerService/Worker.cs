@@ -13,17 +13,20 @@ namespace WorkerService
         private readonly ILogger<Worker> _logger;
         private readonly IEventStoreReader _eventStoreReader;
         private readonly IDomainEventApplier _domainEventApplier;
+        private readonly IApplyDomainEventStrategy _applyDomainEventStrategy;
         private readonly StreamName _domainEventsStreamName;
 
         public Worker(
             ILogger<Worker> logger,
             IEventStoreReader eventStoreReader,
             IDomainEventApplier domainEventApplier,
+            IApplyDomainEventStrategy applyDomainEventStrategy,
             StreamName domainEventsStreamName)
         {
             _logger = logger;
             _eventStoreReader = eventStoreReader;
             _domainEventApplier = domainEventApplier;
+            _applyDomainEventStrategy = applyDomainEventStrategy;
             _domainEventsStreamName = domainEventsStreamName;
         }
 
@@ -36,13 +39,16 @@ namespace WorkerService
 
         private async Task SubscribeAndProcessAllReceivedMessagesAsync(CancellationToken stoppingToken)
         {
-            using (_eventStoreReader.SubscribeTo(_domainEventsStreamName, this))
+            var startPosition = await _domainEventApplier.ReadLastKnownDispatchedDomainEventNumber();
+            using (_eventStoreReader.SubscribeTo(_domainEventsStreamName, startPosition,this))
             {
                 await stoppingToken.WaitAsync();
             }
         }
 
         void IEventStoreStreamMessageReceiver.Receive(DomainEventBuilder domainEventBuilder) => 
-            _domainEventApplier.Pass(domainEventBuilder.Build());
+            _domainEventApplier.Pass(domainEventBuilder
+                .Using(_applyDomainEventStrategy)
+                .Build());
     }
 }
