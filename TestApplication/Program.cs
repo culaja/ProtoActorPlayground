@@ -29,7 +29,7 @@ namespace TestApplication
 
             var domainEventApplier = ProtoActorDomainEventApplierBuilder.New()
                 .Using(new SnapshotConfiguration(
-                    "ConnectTo=tcp://admin:changeit@localhost:1113; DefaultUserCredentials=admin:changeit",
+                    new Uri("tcp://admin:changeit@localhost:1113"),
                     "TestSnapshot",
                     TimeSpan.FromSeconds(10)))
                 .DecorateWith(ConsoleInternalLogger.New())

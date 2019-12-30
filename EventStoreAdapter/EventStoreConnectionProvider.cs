@@ -11,7 +11,7 @@ namespace EventStoreAdapter
         private static readonly object SyncObject = new object();
         private static Optional<IEventStoreConnection> _eventStoreConnectionInstance = None;
         
-        public static Task<IEventStoreConnection> GrabSingleEventStoreConnectionFor(string connectionString)
+        public static Task<IEventStoreConnection> GrabSingleEventStoreConnectionFor(Uri connectionString)
         {
             if (_eventStoreConnectionInstance.HasNoValue)
             {
@@ -19,7 +19,7 @@ namespace EventStoreAdapter
                 {
                     if (_eventStoreConnectionInstance.HasNoValue)
                     {
-                        _eventStoreConnectionInstance = From(EventStoreConnection.Create(GetConnectionBuilder(), new Uri(connectionString)));
+                        _eventStoreConnectionInstance = From(EventStoreConnection.Create(GetConnectionBuilder(), connectionString));
                         return _eventStoreConnectionInstance.Value.ConnectAsync()
                             .ContinueWith(t => _eventStoreConnectionInstance.Value);
                     }

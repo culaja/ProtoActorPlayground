@@ -7,8 +7,8 @@ namespace WorkerService
 {
     public static class ConfigurationReader
     {
-        public static string EventStoreConnectionString(this IConfiguration configuration) =>
-            ApplicationConfigurationFrom(configuration).EventStoreConnectionString;
+        public static Uri EventStoreConnectionString(this IConfiguration configuration) =>
+            new Uri(ApplicationConfigurationFrom(configuration).EventStoreConnectionString);
         
         public static StreamName SourceStreamName(this IConfiguration configuration) => 
             StreamName.Of(ApplicationConfigurationFrom(configuration).SourceStreamName);
@@ -17,13 +17,13 @@ namespace WorkerService
         {
             var applicationConfiguration = ApplicationConfigurationFrom(configuration);
             return new SnapshotConfiguration(
-                applicationConfiguration.EventStoreConnectionString,
+                new Uri(applicationConfiguration.EventStoreConnectionString),
                 applicationConfiguration.Snapshot.Name,
                 TimeSpan.FromMilliseconds(applicationConfiguration.Snapshot.PeriodMs));
         }
 
         public static Uri DestinationServiceUri(this IConfiguration configuration) =>
-            new Uri(configuration[$"Application:{nameof(EventStoreConnectionString)}"]);
+            new Uri(ApplicationConfigurationFrom(configuration).DestinationServiceUri);
 
         private static ApplicationConfiguration ApplicationConfigurationFrom(IConfiguration configuration) =>
             configuration.GetSection("Application").Get<ApplicationConfiguration>();

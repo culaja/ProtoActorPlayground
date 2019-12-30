@@ -1,13 +1,17 @@
 ﻿using System;
+using EventStore.ClientAPI;
 
 namespace ProtoActorAdapter
 {
     public sealed class SnapshotConfiguration
     {
-        private readonly string _connectionString;
-
+        private readonly Uri _connectionString;
+        
+        public string SnapshotName { get; }
+        public TimeSpan SnapshotTimeSpan { get; }
+        
         public SnapshotConfiguration(
-            string connectionString,
+            Uri connectionString,
             string snapshotName,
             TimeSpan snapshotTimeSpan)
         {
@@ -16,9 +20,6 @@ namespace ProtoActorAdapter
             SnapshotTimeSpan = snapshotTimeSpan;
         }
 
-        internal string ConnectionString { get; }
-        
-        public string SnapshotName { get; }
-        public TimeSpan SnapshotTimeSpan { get; }
+        public string FormattedConnectionString => $"ConnectTo={_connectionString}";
     }
 }

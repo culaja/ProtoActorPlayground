@@ -17,7 +17,7 @@ namespace EventStoreReaderTestApp
     {
         static void Main(string[] args)
         {
-            var subscription = EventStoreReader.BuildUsing("tcp://localhost:1113").SubscribeTo(
+            var subscription = EventStoreReader.BuildUsing(new Uri("tcp://localhost:1113")).SubscribeTo(
                 StreamName.Of("Library"), new EventStoreReceiver());
 
             Console.ReadLine();

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Domain;
 using EventStore.ClientAPI;
 using Ports;
@@ -9,14 +10,14 @@ namespace EventStoreAdapter
 {
     public sealed class EventStoreReader : IEventStoreReader
     {
-        private readonly string _connectionString;
+        private readonly Uri _connectionString;
 
-        private EventStoreReader(string connectionString)
+        private EventStoreReader(Uri connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public static IEventStoreReader BuildUsing(string connectionString) => new EventStoreReader(connectionString);
+        public static IEventStoreReader BuildUsing(Uri connectionString) => new EventStoreReader(connectionString);
         
         public IEventStoreSubscription SubscribeTo(StreamName streamName, IEventStoreStreamMessageReceiver receiver)
         {

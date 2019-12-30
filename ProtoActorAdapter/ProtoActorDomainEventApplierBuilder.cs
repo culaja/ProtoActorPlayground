@@ -65,7 +65,7 @@ namespace ProtoActorAdapter
         private static ISnapshotStore BuildEventStoreUsing(SnapshotConfiguration configuration)
         {
             var eventStoreConnection = EventStoreConnection.Create(
-                configuration.ConnectionString,
+                configuration.FormattedConnectionString,
                 ConnectionSettings.Create().KeepReconnecting(),
                 "DomainEventApplier");
             
