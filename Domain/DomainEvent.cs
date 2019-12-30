@@ -32,7 +32,7 @@ namespace Domain
             public string Data { get; }
             public string MetaData { get; }
 
-            public Task<bool> TryApply() => _applyDomainEventStrategy.TryApply(this);
+            public Task<Result> TryApply() => _applyDomainEventStrategy.TryApply(this);
             
             public string ToJson() => $"{{\"Number\": {Number}, \"TopicName\": \"{TopicName}\", \"TopicVersion\": {TopicVersion}, \"Data\": {Data}, \"MetaData\": {MetaData}}}";
 

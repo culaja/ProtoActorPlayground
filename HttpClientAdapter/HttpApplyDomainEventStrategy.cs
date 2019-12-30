@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Domain;
+using Framework;
 
 namespace HttpClientAdapter
 {
@@ -17,7 +18,7 @@ namespace HttpClientAdapter
             _destinationUri = destinationUri;
         }
         
-        public async Task<bool> TryApply(IDomainEvent domainEvent)
+        public async Task<Result> TryApply(IDomainEvent domainEvent)
         {
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _destinationUri)
             {
@@ -26,7 +27,9 @@ namespace HttpClientAdapter
         
             var response = await HttpClient.SendAsync(httpRequestMessage);
         
-            return response.IsSuccessStatusCode;
+            return response.IsSuccessStatusCode
+                ? Result.Ok()
+                : Result.Fail(response.ReasonPhrase);
         }
     }
 }

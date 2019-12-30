@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Framework;
 
 namespace Domain
 {
@@ -8,7 +9,7 @@ namespace Domain
         
         string TopicName { get; }
 
-        Task<bool> TryApply();
+        Task<Result> TryApply();
 
         string ToJson();
     }

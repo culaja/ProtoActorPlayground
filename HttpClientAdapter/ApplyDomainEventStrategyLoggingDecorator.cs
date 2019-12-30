@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Domain;
+using Framework;
 using Ports;
 
 namespace HttpClientAdapter
@@ -17,19 +17,32 @@ namespace HttpClientAdapter
             _next = next;
         }
 
-        public async Task<bool> TryApply(IDomainEvent domainEvent)
+        public async Task<Result> TryApply(IDomainEvent domainEvent)
         {
             try
             {
                 _internalLogger.Verbose($"Applying domain event with number {domainEvent.Number} ...");
                 var result = await _next.TryApply(domainEvent);
-                _internalLogger.Verbose($"Domain event with number {domainEvent.Number} applied");
+                LogResponse(domainEvent, result);
+                
                 return result;
             }
             catch (Exception ex)
             {
                 _internalLogger.Error($"{_next.GetType().Name} didn't handle exception during applying domain event with number {domainEvent.Number}", ex);
                 throw;
+            }
+        }
+
+        private void LogResponse(IDomainEvent domainEvent, Result result)
+        {
+            if (result.IsSuccess)
+            {
+                _internalLogger.Verbose($"Domain event with number {domainEvent.Number} applied.");
+            }
+            else
+            {
+                _internalLogger.Warning($"Failed to apply domain event '{domainEvent}'. Reason: {result.Error}");
             }
         }
     }

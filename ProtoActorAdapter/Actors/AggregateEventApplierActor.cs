@@ -50,7 +50,7 @@ namespace ProtoActorAdapter.Actors
             {
                 context.ReenterAfter(@event.TryApply(), async result =>
                 {
-                    if (await result)
+                    if ((await result).IsSuccess)
                     {
                         var message = new DomainEventAppliedMessage(@event);
                         context.Send(context.Self, message);

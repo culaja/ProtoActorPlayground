@@ -69,7 +69,7 @@ namespace Domain
         
         private sealed class AlwaysSuccessApplyDomainEventStrategy : IApplyDomainEventStrategy
         {
-            public Task<bool> TryApply(IDomainEvent domainEvent) => Task.FromResult(true);
+            public Task<Result> TryApply(IDomainEvent domainEvent) => Task.FromResult(Result.Ok());
         }
     }
 }

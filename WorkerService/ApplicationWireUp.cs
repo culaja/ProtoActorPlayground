@@ -12,14 +12,14 @@ namespace WorkerService
     {
         public static void RegisterApplicationComponentsUsing(this IServiceCollection service, IConfiguration configuration) 
             => service
-                .RegisterLogger(configuration)
+                .RegisterLogger()
                 .RegisterEventStoreAdapterUsing(configuration)
                 .RegisterSourceStreamNameUsing(configuration)
                 .RegisterProtoActorAdapterUsing(configuration)
                 .RegisterHttpClientAdapterUsing(configuration)
                 .AddHostedService<Worker>();
 
-        private static IServiceCollection RegisterLogger(this IServiceCollection service, IConfiguration _)
+        private static IServiceCollection RegisterLogger(this IServiceCollection service)
             => service.AddSingleton(provider => Logger.NewUsing(provider.GetService<ILogger<Worker>>()));
 
         private static IServiceCollection RegisterEventStoreAdapterUsing(this IServiceCollection service, IConfiguration configuration)
