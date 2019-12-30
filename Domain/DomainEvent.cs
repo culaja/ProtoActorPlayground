@@ -33,7 +33,8 @@ namespace Domain
             public string MetaData { get; }
 
             public Task<bool> TryApply() => _applyDomainEventStrategy.TryApply(this);
-            public string ToJson() => $"{{\"Number\" = {Number},\"TopicName\" =\"{TopicName}\",{{\"TopicVersion\" = {TopicVersion},Data = \"{Data}\",MetaData =\"{MetaData}\"}}";
+            
+            public string ToJson() => $"{{\"Number\": {Number}, \"TopicName\": \"{TopicName}\", \"TopicVersion\": {TopicVersion}, \"Data\": {Data}, \"MetaData\": {MetaData}}}";
 
             public override string ToString()
             {
