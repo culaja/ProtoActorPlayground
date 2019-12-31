@@ -14,25 +14,25 @@ namespace WorkerService
         private readonly IEventStoreReader _eventStoreReader;
         private readonly IDomainEventApplier _domainEventApplier;
         private readonly IApplyDomainEventStrategy _applyDomainEventStrategy;
-        private readonly StreamName _domainEventsStreamName;
+        private readonly SourceStreamName _domainEventsSourceStreamName;
 
         public Worker(
             ILogger<Worker> logger,
             IEventStoreReader eventStoreReader,
             IDomainEventApplier domainEventApplier,
             IApplyDomainEventStrategy applyDomainEventStrategy,
-            StreamName domainEventsStreamName)
+            SourceStreamName domainEventsSourceStreamName)
         {
             _logger = logger;
             _eventStoreReader = eventStoreReader;
             _domainEventApplier = domainEventApplier;
             _applyDomainEventStrategy = applyDomainEventStrategy;
-            _domainEventsStreamName = domainEventsStreamName;
+            _domainEventsSourceStreamName = domainEventsSourceStreamName;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"{nameof(Worker)} started. Subscribing to '{_domainEventsStreamName}' stream ...");
+            _logger.LogInformation($"{nameof(Worker)} started. Subscribing to '{_domainEventsSourceStreamName}' stream ...");
             await SubscribeAndProcessAllReceivedMessagesAsync(stoppingToken);
             _logger.LogInformation($"{nameof(Worker)} stopped.");
         }
@@ -40,7 +40,7 @@ namespace WorkerService
         private async Task SubscribeAndProcessAllReceivedMessagesAsync(CancellationToken stoppingToken)
         {
             var startPosition = await _domainEventApplier.ReadLastKnownDispatchedDomainEventNumber();
-            using (_eventStoreReader.SubscribeTo(_domainEventsStreamName, startPosition,this))
+            using (_eventStoreReader.SubscribeTo(_domainEventsSourceStreamName, startPosition,this))
             {
                 await stoppingToken.WaitAsync();
             }
