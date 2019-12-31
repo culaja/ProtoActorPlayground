@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace WorkerService
 {
@@ -17,12 +18,30 @@ namespace WorkerService
                 .AddEnvironmentVariables()
                 .Build();
             
-            CreateHostBuilder(args).Build().Run();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(_configuration)
+                .CreateLogger();
+
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Fatal(ex, $"Unhandled exception in {nameof(WorkerService)}");
+                throw;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseWindowsService()
                 .ConfigureServices((hostContext, services) => 
-                    services.RegisterApplicationComponentsUsing(_configuration));
+                    services.RegisterApplicationComponentsUsing(_configuration))
+                .UseSerilog();
     }
 }

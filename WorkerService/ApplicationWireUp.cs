@@ -2,7 +2,6 @@
 using HttpClientAdapter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Ports;
 using ProtoActorAdapter;
 
@@ -20,7 +19,7 @@ namespace WorkerService
                 .AddHostedService<Worker>();
 
         private static IServiceCollection RegisterLogger(this IServiceCollection service)
-            => service.AddSingleton(provider => Logger.NewUsing(provider.GetService<ILogger<Worker>>()));
+            => service.AddSingleton(provider => Logger.New());
 
         private static IServiceCollection RegisterEventStoreAdapterUsing(this IServiceCollection service, IConfiguration configuration)
             => service.AddSingleton(EventStoreReader.BuildUsing(configuration.EventStoreConnectionString()));

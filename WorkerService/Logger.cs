@@ -1,43 +1,45 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
 using Ports;
+using Serilog;
 
 namespace WorkerService
 {
     internal sealed class Logger : IInternalLogger
     {
-        private readonly ILogger<Worker> _logger;
-
-        private Logger(ILogger<Worker> logger)
+        private Logger()
         {
-            _logger = logger;
         }
         
-        public static IInternalLogger NewUsing(ILogger<Worker> logger) => new Logger(logger);
+        public static IInternalLogger New() => new Logger();
         
         public void Verbose(string message)
         {
-            _logger.LogTrace(message);
+            Log.Logger.Verbose(message);
         }
 
         public void Debug(string message)
         {
-            _logger.LogDebug(message);
+            Log.Logger.Debug(message);
         }
 
         public void Information(string message)
         {
-            _logger.LogInformation(message);
+            Log.Logger.Information(message);
         }
 
         public void Warning(string message)
         {
-            _logger.LogWarning(message);
+            Log.Logger.Warning(message);
         }
 
         public void Error(string message, Exception ex)
         {
-            _logger.LogError(ex, message);
+            Log.Logger.Error(ex, message);
+        }
+
+        public void Fatal(string message, Exception ex)
+        {
+            Log.Logger.Fatal(ex, message);
         }
     }
 }

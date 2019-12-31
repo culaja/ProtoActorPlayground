@@ -9,5 +9,6 @@ namespace Ports
         void Information(string message);
         void Warning(string message);
         void Error(string message, Exception ex);
+        void Fatal(string message, Exception ex);
     }
 }
