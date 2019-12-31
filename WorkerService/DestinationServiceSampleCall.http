@@ -1,0 +1,16 @@
+﻿POST https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9
+Content-Type: application/json
+
+{
+  "number": 10,
+  "topicName": "SomeAggregate",
+  "topicVersion":4,
+  "data" : {
+    "someData": 4
+  },
+  "metaData" : {
+    "someMetaData": "john.doe@example.com"
+  }
+}
+
+###
