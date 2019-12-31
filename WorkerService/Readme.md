@@ -35,3 +35,22 @@ rolling interval, etc.
 - Properties configuration like application name. (This is useful if in
 the future Seq server is used as a sink to distinguish logs between 
 different applications.
+
+# Installing and running as Windows service
+In order to install the application as a Windows service run the
+following command in `cmd`:
+```bash
+sc create EventStoreMessageDispatcher binPath="<dir_path>\EventStoreMessageDispatcher.exe"
+```
+After Windows service is installed it can be run using the following
+command:
+```bash
+sc start EventStoreMessageDispatcher
+```
+
+# Running the application as console application
+Regardless if the application is already installed as a Windows service
+you can run a separate instance though `cmd`:
+```bash
+C:\dir_path>EventStoreMessageDispatcher.exe
+```
