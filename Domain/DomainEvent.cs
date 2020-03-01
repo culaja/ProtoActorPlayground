@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Framework;
+using Newtonsoft.Json;
 
 namespace Domain
 {
@@ -34,7 +35,7 @@ namespace Domain
 
             public Task<Result> TryApply() => _applyDomainEventStrategy.TryApply(this);
             
-            public string ToJson() => $"{{\"Number\": {Number}, \"TopicName\": \"{TopicName}\", \"TopicVersion\": {TopicVersion}, \"Data\": {Data}, \"MetaData\": {MetaData}}}";
+            public string ToJson() => JsonConvert.SerializeObject(this);
 
             public override string ToString()
             {
