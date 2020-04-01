@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Domain;
+using Ports;
 using Proto;
 using Proto.Persistence;
 using Proto.Schedulers.SimpleScheduler;
@@ -12,7 +13,8 @@ namespace ProtoActorAdapter.Actors
     public sealed class EventMonitorActor : IActor
     {
         private readonly TimeSpan _snapshotTimeSpan;
-        
+        private readonly IInternalLogger _logger;
+
         private readonly Persistence _persistence;
         private readonly ISimpleScheduler _scheduler = new SimpleScheduler();
         private readonly ConsecutiveNumberIntervals _consecutiveNumberIntervals = ConsecutiveNumberIntervals.StartFrom(0);
@@ -21,9 +23,11 @@ namespace ProtoActorAdapter.Actors
         public EventMonitorActor(
             ISnapshotStore snapshotStore,
             string actorId,
-            TimeSpan snapshotTimeSpan)
+            TimeSpan snapshotTimeSpan,
+            IInternalLogger logger)
         {
             _snapshotTimeSpan = snapshotTimeSpan;
+            _logger = logger;
             _persistence = Persistence.WithSnapshotting(snapshotStore, actorId, ApplySnapshot);
         }
 
@@ -34,7 +38,7 @@ namespace ProtoActorAdapter.Actors
                 case Started _:
                     return HandleStarted(context);
                 case DomainEventAppliedMessage message:
-                    HandleDomainEventApplied(context, message);
+                    HandleDomainEventApplied(message);
                     break;
                 case TakeSnapshotOfAppliedDomainEventsMessage _:
                     return HandleTakeSnapshotOfAppliedDomainEventsMessage();
@@ -54,7 +58,7 @@ namespace ProtoActorAdapter.Actors
             return _persistence.RecoverStateAsync(); 
         }
 
-        private void HandleDomainEventApplied(IContext context, DomainEventAppliedMessage message) => 
+        private void HandleDomainEventApplied(DomainEventAppliedMessage message) => 
             _consecutiveNumberIntervals.Insert(message.DomainEvent.Number);
 
         private Task HandleTakeSnapshotOfAppliedDomainEventsMessage() =>
@@ -68,6 +72,7 @@ namespace ProtoActorAdapter.Actors
         private Task TakeSnapshot()
         {
             _lastSnapshottedDomainEventNumber = _consecutiveNumberIntervals.LargestConsecutiveNumber;
+            _logger.Information($"[{nameof(EventMonitorActor)}] Creating a snapshot at largest consecutive applied event number: '{_lastSnapshottedDomainEventNumber}'.");
             return _persistence.PersistSnapshotAsync(_consecutiveNumberIntervals.LargestConsecutiveNumber);
         }
 

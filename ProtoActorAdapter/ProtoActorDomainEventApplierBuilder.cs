@@ -82,7 +82,8 @@ namespace ProtoActorAdapter
             var props = Props.FromProducer(() => new EventMonitorActor(
                 snapshotStore,
                 configuration.SnapshotName,
-                configuration.SnapshotTimeSpan));
+                configuration.SnapshotTimeSpan,
+                internalLogger));
             
             return rootContext.SpawnNamed(
                 DecorateWithLogger(internalLogger, props, nameof(EventMonitorActor)),

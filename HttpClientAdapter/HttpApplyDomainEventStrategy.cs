@@ -26,10 +26,11 @@ namespace HttpClientAdapter
             };
         
             var response = await HttpClient.SendAsync(httpRequestMessage);
-        
+
+            var errorMessage = await response.Content.ReadAsStringAsync();
             return response.IsSuccessStatusCode
                 ? Result.Ok()
-                : Result.Fail(response.ReasonPhrase);
+                : Result.Fail($"Code: {response.ReasonPhrase}, Error: {errorMessage}");
         }
     }
 }
