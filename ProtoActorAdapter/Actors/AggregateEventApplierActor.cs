@@ -41,7 +41,10 @@ namespace ProtoActorAdapter.Actors
         private void HandleEnqueueDomainEvent(IContext context, EnqueueDomainEventMessage message)
         {
             _queue.Enqueue(message.DomainEvent);
-            context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.DomainEvent));
+            if (_queue.Count == 1)
+            {
+                context.Send(context.Self, new ApplyDomainEventFromQueueMessage(message.DomainEvent));
+            }
         }
 
         private void HandleApplyDomainEventFromQueue(IContext context, IDomainEvent @event)
@@ -67,7 +70,7 @@ namespace ProtoActorAdapter.Actors
         private void HandleDomainAppliedEvent(IContext context, DomainEventAppliedMessage message)
         {
             var dequeuedEvent = _queue.Dequeue();
-            if (dequeuedEvent != message.DomainEvent) throw new InvalidOperationException("Events are not the same");
+            if (dequeuedEvent != message.DomainEvent) throw new InvalidOperationException($"Events are not the same. a) {message.DomainEvent}, b) {dequeuedEvent}");
             if (_queue.Count > 0 ) context.Send(context.Self, new ApplyDomainEventFromQueueMessage(_queue.Peek()));
         }
     }
