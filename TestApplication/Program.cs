@@ -13,6 +13,7 @@ namespace TestApplication
         {
             var httpApplyDomainEventStrategy = HttpApplyDomainEventStrategyBuilder.New()
                 .WithDestinationUri(new Uri("https://webhook.site/9705d5a2-8189-4bdc-959f-ed5540e5cdc9"))
+                .WithMaxConnectionsPerServer(int.MaxValue)
                 .DecorateWith(ConsoleInternalLogger.New())
                 .Build();
             

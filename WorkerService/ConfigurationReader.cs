@@ -24,6 +24,9 @@ namespace WorkerService
 
         public static Uri DestinationServiceUri(this IConfiguration configuration) =>
             new Uri(ApplicationConfigurationFrom(configuration).DestinationServiceUri);
+        
+        public static int MaxConnectionsPerServer(this IConfiguration configuration) =>
+            ApplicationConfigurationFrom(configuration).MaxConnectionsPerServer;
 
         private static ApplicationConfiguration ApplicationConfigurationFrom(IConfiguration configuration) =>
             configuration.GetSection("Application").Get<ApplicationConfiguration>();
@@ -34,6 +37,7 @@ namespace WorkerService
             public string SourceStreamName { get; set; }
             public Snapshot Snapshot { get; set; }
             public string DestinationServiceUri { get; set; }
+            public int MaxConnectionsPerServer { get; set; }
         }
 
         private sealed class Snapshot

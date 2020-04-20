@@ -37,6 +37,7 @@ namespace WorkerService
         private static IServiceCollection RegisterHttpClientAdapterUsing(this IServiceCollection service, IConfiguration configuration)
             => service.AddSingleton(provider => HttpApplyDomainEventStrategyBuilder.New()
                 .WithDestinationUri(configuration.DestinationServiceUri())
+                .WithMaxConnectionsPerServer(configuration.MaxConnectionsPerServer())
                 .DecorateWith(provider.GetService<IInternalLogger>())
                 .Build());
     }

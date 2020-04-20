@@ -9,15 +9,18 @@ namespace HttpClientAdapter
 {
     internal sealed class HttpApplyDomainEventStrategy : IApplyDomainEventStrategy
     {
-        private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler
-        {
-            MaxConnectionsPerServer = 100
-        });
+        private readonly HttpClient _httpClient;
         
         private readonly Uri _destinationUri;
 
-        public HttpApplyDomainEventStrategy(Uri destinationUri)
+        public HttpApplyDomainEventStrategy(
+            Uri destinationUri,
+            int maxConnectionsPerServer)
         {
+            _httpClient  = new HttpClient(new HttpClientHandler
+            {
+                MaxConnectionsPerServer = maxConnectionsPerServer
+            });
             _destinationUri = destinationUri;
         }
         
@@ -28,7 +31,7 @@ namespace HttpClientAdapter
                 Content = new StringContent(domainEvent.ToJson(), Encoding.UTF8, "application/json")
             };
         
-            var response = await HttpClient.ProcessAsync(httpRequestMessage);
+            var response = await _httpClient.ProcessAsync(httpRequestMessage);
             
             var errorMessage = await response.ReadyBodyAsString();
             return response.IsSuccessStatusCode
