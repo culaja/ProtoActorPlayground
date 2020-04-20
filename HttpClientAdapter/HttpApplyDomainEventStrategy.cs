@@ -9,7 +9,10 @@ namespace HttpClientAdapter
 {
     internal sealed class HttpApplyDomainEventStrategy : IApplyDomainEventStrategy
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler
+        {
+            MaxConnectionsPerServer = 100
+        });
         
         private readonly Uri _destinationUri;
 
@@ -25,12 +28,12 @@ namespace HttpClientAdapter
                 Content = new StringContent(domainEvent.ToJson(), Encoding.UTF8, "application/json")
             };
         
-            var response = await HttpClient.SendAsync(httpRequestMessage);
-
-            var errorMessage = await response.Content.ReadAsStringAsync();
+            var response = await HttpClient.ProcessAsync(httpRequestMessage);
+            
+            var errorMessage = await response.ReadyBodyAsString();
             return response.IsSuccessStatusCode
                 ? Result.Ok()
-                : Result.Fail($"Code: {response.ReasonPhrase}, Error: {errorMessage}");
+                : Result.Fail($"Code: {response.StatusCode} Reason: {response.ReasonPhrase}; {errorMessage}");
         }
     }
 }
