@@ -15,6 +15,7 @@ namespace WorkerService
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+                .AddJsonFileFrom(args)
                 .AddEnvironmentVariables()
                 .Build();
             
