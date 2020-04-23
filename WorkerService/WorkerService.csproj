@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
         <UserSecretsId>dotnet-WorkerService-DD639A3D-C78B-4BF4-8530-A39FD2BF56A6</UserSecretsId>
-        <AssemblyName>EventStoreMessageDispatcher</AssemblyName>
+        <AssemblyName>ScalableEventBus</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

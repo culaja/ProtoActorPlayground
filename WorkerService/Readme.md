@@ -40,17 +40,17 @@ different applications.
 In order to install the application as a Windows service run the
 following command in `cmd`:
 ```bash
-sc create EventStoreMessageDispatcher binPath="<dir_path>\EventStoreMessageDispatcher.exe"
+sc create ScalableEventBus binPath="<dir_path>\SclableEventBus.exe"
 ```
 After Windows service is installed it can be run using the following
 command:
 ```bash
-sc start EventStoreMessageDispatcher
+sc start ScalableEventBus
 ```
 
 # Running the application as console application
 Regardless if the application is already installed as a Windows service
 you can run a separate instance though `cmd`:
 ```bash
-C:\dir_path>EventStoreMessageDispatcher.exe
+C:\dir_path>ScalableEventBus.exe
 ```
