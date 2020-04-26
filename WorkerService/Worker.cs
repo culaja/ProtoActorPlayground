@@ -38,7 +38,7 @@ namespace WorkerService
 
         private async Task SubscribeAndProcessAllReceivedMessagesAsync(CancellationToken stoppingToken)
         {
-            var startPosition = await _domainEventApplier.ReadLastKnownDispatchedDomainEventNumber();
+            var startPosition = await _domainEventApplier.ReadLastKnownDispatchedDomainEventNumber(stoppingToken);
             _logger.Information($"Last known dispatched domain event number is '{startPosition}'.");
             using (_eventStoreReader.SubscribeTo(_domainEventsSourceStreamName, startPosition,this))
             {

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Framework;
 using Proto.Persistence;
 
 namespace ProtoActorAdapter
@@ -16,7 +18,20 @@ namespace ProtoActorAdapter
             _snapshotName = snapshotName;
         }
 
-        public async Task<long> ReadLastSnapshot()
+        public async Task<long> ReadLastSnapshot(CancellationToken cancellationToken)
+        {
+            long lastSnapshottedPosition = -1; 
+            await Task.WhenAny(
+                Task.Run(async () =>
+                {
+                    lastSnapshottedPosition = await ReadSnapshotAsync();
+                }),
+                cancellationToken.WaitAsync());
+
+            return lastSnapshottedPosition;
+        }
+
+        private async Task<long> ReadSnapshotAsync()
         {
             var result = await _snapshotStore.GetSnapshotAsync(_snapshotName);
             switch (result.Snapshot)

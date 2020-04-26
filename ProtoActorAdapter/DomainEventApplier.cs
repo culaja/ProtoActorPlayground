@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Domain;
 using Ports;
 using Proto;
@@ -22,9 +23,9 @@ namespace ProtoActorAdapter
             _rootActorId = rootActorId;
         }
 
-        public Task<long> ReadLastKnownDispatchedDomainEventNumber()
+        public Task<long> ReadLastKnownDispatchedDomainEventNumber(CancellationToken token)
         {
-            return _eventMonitorActorSnapshotReader.ReadLastSnapshot();
+            return _eventMonitorActorSnapshotReader.ReadLastSnapshot(token);
         }
         
         public void Pass(IDomainEvent @event)

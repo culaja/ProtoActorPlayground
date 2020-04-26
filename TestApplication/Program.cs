@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain;
 using HttpClientAdapter;
@@ -36,7 +37,7 @@ namespace TestApplication
                 .DecorateWith(ConsoleInternalLogger.New())
                 .Build();
 
-            var lastDispatchedDomainEvent = await domainEventApplier.ReadLastKnownDispatchedDomainEventNumber();
+            var lastDispatchedDomainEvent = await domainEventApplier.ReadLastKnownDispatchedDomainEventNumber(new CancellationToken());
             foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))
             {
                 domainEventApplier.Pass(domainEvent);
