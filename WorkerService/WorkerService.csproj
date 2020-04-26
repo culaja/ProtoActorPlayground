@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <UserSecretsId>dotnet-WorkerService-DD639A3D-C78B-4BF4-8530-A39FD2BF56A6</UserSecretsId>
         <AssemblyName>ScalableEventBus</AssemblyName>
     </PropertyGroup>
@@ -20,5 +20,12 @@
       <ProjectReference Include="..\HttpClientAdapter\HttpClientAdapter.csproj" />
       <ProjectReference Include="..\Ports\Ports.csproj" />
       <ProjectReference Include="..\ProtoActorAdapter\ProtoActorAdapter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="appsettings.docker2.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 </Project>
