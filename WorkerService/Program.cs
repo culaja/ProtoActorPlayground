@@ -38,11 +38,10 @@ namespace WorkerService
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
-                .ConfigureServices((hostContext, services) => 
-                    services.RegisterApplicationComponentsUsing(_configuration))
+                .ConfigureServices((_, services) => services.RegisterApplicationComponentsUsing(_configuration))
                 .UseSerilog();
     }
 }
