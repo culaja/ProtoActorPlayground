@@ -10,8 +10,8 @@ namespace WorkerService
         public static Uri EventStoreConnectionString(this IConfiguration configuration) =>
             new Uri(ApplicationConfigurationFrom(configuration).EventStoreConnectionString);
         
-        public static SourceStream SourceStreamName(this IConfiguration configuration) => 
-            SourceStream.Of(ApplicationConfigurationFrom(configuration).SourceStreamName);
+        public static SourceStreamName SourceStreamName(this IConfiguration configuration) => 
+            Domain.SourceStreamName.Of(ApplicationConfigurationFrom(configuration).SourceStreamName);
 
         public static SnapshotConfiguration SnapshotConfiguration(this IConfiguration configuration)
         {

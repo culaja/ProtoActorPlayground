@@ -3,16 +3,16 @@ using Framework;
 
 namespace Domain
 {
-    public sealed class SourceStream : ValueObject
+    public sealed class SourceStreamName : ValueObject
     {
         private readonly string _name;
 
-        private SourceStream(string name)
+        private SourceStreamName(string name)
         {
             _name = name;
         }
         
-        public static SourceStream Of(string name) => new SourceStream(name);
+        public static SourceStreamName Of(string name) => new SourceStreamName(name);
         
         protected override IEnumerable<object> GetEqualityComponents()
         {
@@ -21,6 +21,6 @@ namespace Domain
 
         public override string ToString() => _name;
 
-        public static implicit operator string(SourceStream sourceStream) => sourceStream.ToString();
+        public static implicit operator string(SourceStreamName sourceStreamName) => sourceStreamName.ToString();
     }
 }
