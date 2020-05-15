@@ -40,8 +40,8 @@ namespace EventStoreAdapter
             var sourceStreamName = SourceStreamName.Of(resolvedEvent.Event.EventStreamId);
             return DomainEventBuilder.New()
                 .WithNumber(resolvedEvent.OriginalEventNumber)
-                .ForAggregate(sourceStreamName)
-                .WithAggregateVersion(resolvedEvent.Event.EventNumber)
+                .ForTopic(sourceStreamName)
+                .WithTopicVersion(resolvedEvent.Event.EventNumber)
                 .WithData(Encoding.UTF8.GetString(resolvedEvent.Event.Data))
                 .WithMetadata(Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
         }

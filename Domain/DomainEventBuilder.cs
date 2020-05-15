@@ -7,8 +7,8 @@ namespace Domain
     public sealed partial class DomainEventBuilder
     {
         private long? _optionalNumber;
-        private Optional<string> _optionalAggregateId;
-        private long? _optionalAggregateVersion;
+        private Optional<string> _optionalTopicName;
+        private long? _optionalTopicVersion;
         private Optional<string> _optionalData;
         private Optional<string> _optionalMetadata;
         private IApplyDomainEventStrategy _applyDomainEventStrategy = new AlwaysSuccessApplyDomainEventStrategy();
@@ -21,15 +21,15 @@ namespace Domain
             return this;
         }
 
-        public DomainEventBuilder ForAggregate(string aggregateId)
+        public DomainEventBuilder ForTopic(string topicName)
         {
-            _optionalAggregateId = aggregateId;
+            _optionalTopicName = topicName;
             return this;
         }
 
-        public DomainEventBuilder WithAggregateVersion(long aggregateVersion)
+        public DomainEventBuilder WithTopicVersion(long topicVersion)
         {
-            _optionalAggregateVersion = aggregateVersion;
+            _optionalTopicVersion = topicVersion;
             return this;
         }
 
@@ -54,14 +54,14 @@ namespace Domain
         public IDomainEvent Build()
         {
             if (!_optionalNumber.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalNumber));
-            if (_optionalAggregateId.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalAggregateId));
-            if (!_optionalAggregateVersion.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalAggregateId));
+            if (_optionalTopicName.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalTopicName));
+            if (!_optionalTopicVersion.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalTopicName));
             if (_optionalData.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalData));
             if (_optionalMetadata.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalMetadata));
             return new DomainEvent(
                 _optionalNumber.Value,
-                _optionalAggregateId.Value,
-                _optionalAggregateVersion.Value,
+                _optionalTopicName.Value,
+                _optionalTopicVersion.Value,
                 _optionalData.Value,
                 _optionalMetadata.Value,
                 _applyDomainEventStrategy);
