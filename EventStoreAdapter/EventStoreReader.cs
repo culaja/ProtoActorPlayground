@@ -35,15 +35,12 @@ namespace EventStoreAdapter
             return new EventStoreSubscription(catchUpSubscription);
         }
 
-        private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent)
-        {
-            var sourceStreamName = SourceStreamName.Of(resolvedEvent.Event.EventStreamId);
-            return DomainEventBuilder.New()
+        private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent) =>
+            DomainEventBuilder.New()
                 .WithNumber(resolvedEvent.OriginalEventNumber)
-                .ForTopic(sourceStreamName)
+                .ForTopic(resolvedEvent.Event.EventStreamId)
                 .WithTopicVersion(resolvedEvent.Event.EventNumber)
                 .WithData(Encoding.UTF8.GetString(resolvedEvent.Event.Data))
                 .WithMetadata(Encoding.UTF8.GetString(resolvedEvent.Event.Metadata));
-        }
     }
 }
