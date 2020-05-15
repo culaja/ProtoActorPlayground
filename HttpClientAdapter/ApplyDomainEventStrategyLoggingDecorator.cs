@@ -21,7 +21,7 @@ namespace HttpClientAdapter
         {
             try
             {
-                _internalLogger.Verbose($"Applying domain event with number {domainEvent.Number} ...");
+                _internalLogger.Verbose($"Applying domain event with number {domainEvent.Position} ...");
                 var result = await _next.TryApply(domainEvent);
                 LogResponse(domainEvent, result);
                 
@@ -29,7 +29,7 @@ namespace HttpClientAdapter
             }
             catch (Exception ex)
             {
-                _internalLogger.Error($"{_next.GetType().Name} didn't handle exception during applying domain event with number {domainEvent.Number}", ex);
+                _internalLogger.Error($"{_next.GetType().Name} didn't handle exception during applying domain event with number {domainEvent.Position}", ex);
                 throw;
             }
         }
@@ -38,7 +38,7 @@ namespace HttpClientAdapter
         {
             if (result.IsSuccess)
             {
-                _internalLogger.Verbose($"Domain event with number {domainEvent.Number} applied.");
+                _internalLogger.Verbose($"Domain event with number {domainEvent.Position} applied.");
             }
             else
             {

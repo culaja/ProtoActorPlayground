@@ -25,7 +25,7 @@ namespace WorkerService
             => service.AddSingleton(EventStoreReader.BuildUsing(configuration.EventStoreConnectionString()));
 
         private static IServiceCollection RegisterSourceStreamNameUsing(this IServiceCollection service, IConfiguration configuration)
-            => service.AddSingleton(configuration.SourceStreamName());
+            => service.AddSingleton(configuration.StreamPrefix());
 
         private static IServiceCollection RegisterProtoActorAdapterUsing(this IServiceCollection service,
             IConfiguration configuration)

@@ -4,6 +4,6 @@ namespace Ports
 {
     public interface IEventStoreStreamMessageReceiver
     {
-        void Receive(DomainEventBuilder domainEventBuilder);
+        IDomainEvent Receive(DomainEventBuilder domainEventBuilder);
     }
 }

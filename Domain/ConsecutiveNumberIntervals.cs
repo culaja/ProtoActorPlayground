@@ -8,19 +8,19 @@ namespace Domain
     {
         private readonly List<ConsecutiveNumberInterval> _sortedConsecutiveNumberIntervals;
 
-        private ConsecutiveNumberIntervals(long staringPoint)
+        private ConsecutiveNumberIntervals(DomainEventPosition staringPoint)
         {
             _sortedConsecutiveNumberIntervals = new List<ConsecutiveNumberInterval>
             {
-                ConsecutiveNumberInterval.NewFor(0, staringPoint)
+                ConsecutiveNumberInterval.NewFor(DomainEventPosition.Start, staringPoint)
             };
         }
         
-        public static ConsecutiveNumberIntervals New() => new ConsecutiveNumberIntervals(0);
+        public static ConsecutiveNumberIntervals New() => new ConsecutiveNumberIntervals(DomainEventPosition.Start);
         
-        public static ConsecutiveNumberIntervals StartFrom(long staringPoint) => new ConsecutiveNumberIntervals(staringPoint);
+        public static ConsecutiveNumberIntervals StartFrom(DomainEventPosition staringPoint) => new ConsecutiveNumberIntervals(staringPoint);
         
-        public void Insert(long number)
+        public void Insert(DomainEventPosition number)
         {
             var newInterval = ConsecutiveNumberInterval.NewFor(number);
             Insert(newInterval);
@@ -74,7 +74,7 @@ namespace Domain
 
         private static bool LeftIntervalExistsFor(int position) => position > 0;
 
-        public long LargestConsecutiveNumber => _sortedConsecutiveNumberIntervals.First().Tail;
+        public DomainEventPosition LargestConsecutiveNumber => _sortedConsecutiveNumberIntervals.First().Tail;
         
         protected override IEnumerable<object> GetEqualityComponents()
         {

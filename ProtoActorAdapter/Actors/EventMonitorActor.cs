@@ -17,8 +17,8 @@ namespace ProtoActorAdapter.Actors
 
         private readonly Persistence _persistence;
         private readonly ISimpleScheduler _scheduler = new SimpleScheduler();
-        private readonly ConsecutiveNumberIntervals _consecutiveNumberIntervals = ConsecutiveNumberIntervals.StartFrom(0);
-        private long _lastSnapshottedDomainEventNumber;
+        private readonly ConsecutiveNumberIntervals _consecutiveNumberIntervals = ConsecutiveNumberIntervals.StartFrom(DomainEventPosition.Start);
+        private DomainEventPosition _lastSnapshottedDomainEventPosition;
 
         public EventMonitorActor(
             ISnapshotStore snapshotStore,
@@ -59,7 +59,7 @@ namespace ProtoActorAdapter.Actors
         }
 
         private void HandleDomainEventApplied(DomainEventAppliedMessage message) => 
-            _consecutiveNumberIntervals.Insert(message.DomainEvent.Number);
+            _consecutiveNumberIntervals.Insert(message.DomainEvent.Position);
 
         private Task HandleTakeSnapshotOfAppliedDomainEventsMessage() =>
             ShouldTakeSnapshot()
@@ -67,12 +67,12 @@ namespace ProtoActorAdapter.Actors
                 : CompletedTask;
 
         private bool ShouldTakeSnapshot() => 
-            _lastSnapshottedDomainEventNumber != _consecutiveNumberIntervals.LargestConsecutiveNumber;
+            _lastSnapshottedDomainEventPosition != _consecutiveNumberIntervals.LargestConsecutiveNumber;
 
         private Task TakeSnapshot()
         {
-            _lastSnapshottedDomainEventNumber = _consecutiveNumberIntervals.LargestConsecutiveNumber;
-            _logger.Information($"[{nameof(EventMonitorActor)}] Creating a snapshot at largest consecutive applied event number: '{_lastSnapshottedDomainEventNumber}'.");
+            _lastSnapshottedDomainEventPosition = _consecutiveNumberIntervals.LargestConsecutiveNumber;
+            _logger.Information($"[{nameof(EventMonitorActor)}] Creating a snapshot at largest consecutive applied event number: '{_lastSnapshottedDomainEventPosition}'.");
             return _persistence.PersistSnapshotAsync(_consecutiveNumberIntervals.LargestConsecutiveNumber);
         }
 
@@ -80,9 +80,9 @@ namespace ProtoActorAdapter.Actors
         {
             switch (snapshot.State)
             {
-                case long largestConsecutiveNumber:
+                case DomainEventPosition largestConsecutiveNumber:
                     _consecutiveNumberIntervals.Insert(ConsecutiveNumberInterval.FromOneTo(largestConsecutiveNumber));
-                    _lastSnapshottedDomainEventNumber = _consecutiveNumberIntervals.LargestConsecutiveNumber;
+                    _lastSnapshottedDomainEventPosition = _consecutiveNumberIntervals.LargestConsecutiveNumber;
                     break;
                 default:
                     throw new NotSupportedException($"Snapshot not supported: '{snapshot.State}'");

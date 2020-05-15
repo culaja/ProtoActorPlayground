@@ -4,9 +4,6 @@ namespace Ports
 {
     public interface IEventStoreReader
     {
-        IEventStoreSubscription SubscribeTo(
-            SourceStreamName sourceStreamName,
-            long startPosition,
-            IEventStoreStreamMessageReceiver receiver);
+        IEventStoreSubscription SubscribeToAllEvents(DomainEventPosition startPosition, IEventStoreStreamMessageReceiver receiver);
     }
 }

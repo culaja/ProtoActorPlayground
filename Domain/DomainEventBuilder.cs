@@ -6,7 +6,7 @@ namespace Domain
 {
     public sealed partial class DomainEventBuilder
     {
-        private long? _optionalNumber;
+        private DomainEventPosition? _optionalPosition;
         private Optional<string> _optionalTopicName;
         private long? _optionalTopicVersion;
         private Optional<string> _optionalData;
@@ -15,9 +15,9 @@ namespace Domain
         
         public static DomainEventBuilder New() => new DomainEventBuilder();
 
-        public DomainEventBuilder WithNumber(long number)
+        public DomainEventBuilder WithPosition(DomainEventPosition position)
         {
-            _optionalNumber = number;
+            _optionalPosition = position;
             return this;
         }
 
@@ -53,13 +53,13 @@ namespace Domain
 
         public IDomainEvent Build()
         {
-            if (!_optionalNumber.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalNumber));
+            if (!_optionalPosition.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalPosition));
             if (_optionalTopicName.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalTopicName));
             if (!_optionalTopicVersion.HasValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalTopicName));
             if (_optionalData.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalData));
             if (_optionalMetadata.HasNoValue) throw new ArgumentException($"Argument not set in {nameof(DomainEventBuilder)}", nameof(_optionalMetadata));
             return new DomainEvent(
-                _optionalNumber.Value,
+                _optionalPosition.Value,
                 _optionalTopicName.Value,
                 _optionalTopicVersion.Value,
                 _optionalData.Value,

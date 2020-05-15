@@ -2,14 +2,19 @@
 using Domain;
 using EventStoreAdapter;
 using Ports;
+using static Domain.DomainEventPosition;
 
 namespace EventStoreReaderTestApp
 {
     internal sealed class EventStoreReceiver : IEventStoreStreamMessageReceiver
     {
-        public void Receive(DomainEventBuilder builder)
+        public IDomainEvent Receive(DomainEventBuilder builder)
         {
+            var domainEvent = builder.Build();
+            
             Console.WriteLine(builder.Build());
+
+            return domainEvent;
         }
     }
 
@@ -17,8 +22,9 @@ namespace EventStoreReaderTestApp
     {
         static void Main(string[] args)
         {
-            var subscription = EventStoreReader.BuildUsing(new Uri("tcp://localhost:1113")).SubscribeTo(
-                SourceStreamName.Of("AllDomainEvents"), -1, new EventStoreReceiver());
+            var subscription = EventStoreReader
+                .BuildUsing(new Uri("tcp://admin:changeit@localhost:1113"))
+                .SubscribeToAllEvents(Start, new EventStoreReceiver());
 
             Console.ReadLine();
             subscription.Dispose();

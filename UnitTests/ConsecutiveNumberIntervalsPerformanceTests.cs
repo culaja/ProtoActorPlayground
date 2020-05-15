@@ -14,14 +14,14 @@ namespace UnitTests
             
             for (int i = 1; i <= numberCount; ++i)
             {
-                intervals.Insert(i);
+                intervals.Insert(new DomainEventPosition(i, i, i));
                 var unused = intervals.LargestConsecutiveNumber;
             }
             
-            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
+            intervals.LargestConsecutiveNumber.Should().Be(new DomainEventPosition(numberCount, numberCount, numberCount));
         }
 
-        [Fact (Skip = "Test takes more than 3 minutes to execute.")]
+        [Fact ]
         public void simulate_worst_case_scenario()
         {
             var numberCount = 1000000;
@@ -29,17 +29,17 @@ namespace UnitTests
             
             for (int i = 2; i <= numberCount; i += 2)
             {
-                intervals.Insert(i);
+                intervals.Insert(new DomainEventPosition(i, i, i));
                 var unused = intervals.LargestConsecutiveNumber;
             }
             
             for (int i = 1; i <= numberCount; i += 2)
             {
-                intervals.Insert(i);
+                intervals.Insert(new DomainEventPosition(i, i, i));
                 var unused = intervals.LargestConsecutiveNumber;
             }
 
-            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
+            intervals.LargestConsecutiveNumber.Should().Be(new DomainEventPosition(numberCount, numberCount, numberCount));
         }
         
         [Theory]
@@ -56,17 +56,17 @@ namespace UnitTests
                 for (var j = i + 1; j <= i + windowSize; ++j)
                     if (j % skipInterval != 0)
                     {
-                        intervals.Insert(j);
+                        intervals.Insert(new DomainEventPosition(j, j, j));
                          var unused = intervals.LargestConsecutiveNumber;
                     }
                 for (var j = i + 1; j <= i + windowSize; ++j)
                     if (j % skipInterval == 0)
                     {
-                        intervals.Insert(j);
+                        intervals.Insert(new DomainEventPosition(j, j, j));
                         var unused = intervals.LargestConsecutiveNumber;
                     }
             }
-            intervals.LargestConsecutiveNumber.Should().Be(numberCount);
+            intervals.LargestConsecutiveNumber.Should().Be(new DomainEventPosition(numberCount, numberCount, numberCount));
         }
         
     }

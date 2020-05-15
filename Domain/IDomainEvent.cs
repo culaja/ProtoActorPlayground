@@ -5,7 +5,7 @@ namespace Domain
 {
     public interface IDomainEvent
     {
-        long Number { get; }
+        DomainEventPosition Position { get; }
         
         string TopicName { get; }
 

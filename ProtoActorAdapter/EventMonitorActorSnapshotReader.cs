@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Domain;
 using Framework;
 using Proto.Persistence;
 
@@ -18,9 +19,9 @@ namespace ProtoActorAdapter
             _snapshotName = snapshotName;
         }
 
-        public async Task<long> ReadLastSnapshot(CancellationToken cancellationToken)
+        public async Task<DomainEventPosition> ReadLastSnapshot(CancellationToken cancellationToken)
         {
-            long lastSnapshottedPosition = -1; 
+            var lastSnapshottedPosition = DomainEventPosition.Start; 
             await Task.WhenAny(
                 Task.Run(async () =>
                 {
@@ -31,15 +32,15 @@ namespace ProtoActorAdapter
             return lastSnapshottedPosition;
         }
 
-        private async Task<long> ReadSnapshotAsync()
+        private async Task<DomainEventPosition> ReadSnapshotAsync()
         {
             var result = await _snapshotStore.GetSnapshotAsync(_snapshotName);
             switch (result.Snapshot)
             {
                 case null:
-                    return -1;
+                    return DomainEventPosition.Start;
                 default:
-                    return (long) result.Snapshot;
+                    return (DomainEventPosition) result.Snapshot;
             }
         }
     }

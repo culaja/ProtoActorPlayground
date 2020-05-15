@@ -25,12 +25,12 @@ namespace UnitTests
             long mergedHead,
             long mergedTail)
         {
-            var isMerged = ConsecutiveNumberInterval.NewFor(head1, tail1)
-                .TryMerge(ConsecutiveNumberInterval.NewFor(head2, tail2),
+            var isMerged = ConsecutiveNumberInterval.NewFor(new DomainEventPosition(head1, head1, head1), new DomainEventPosition(tail1, tail1, tail1))
+                .TryMerge(ConsecutiveNumberInterval.NewFor(new DomainEventPosition(head2, head2, head2), new DomainEventPosition(tail2, tail2, tail2)),
                     out var mergedInterval);
 
             isMerged.Should().BeTrue();
-            mergedInterval.Should().Be(ConsecutiveNumberInterval.NewFor(mergedHead, mergedTail));
+            mergedInterval.Should().Be(ConsecutiveNumberInterval.NewFor(new DomainEventPosition(mergedHead, mergedHead, mergedHead), new DomainEventPosition(mergedTail, mergedTail, mergedTail)));
         }
         
         [Theory]
@@ -42,8 +42,8 @@ namespace UnitTests
             long head2,
             long tail2)
         {
-            var isMerged = ConsecutiveNumberInterval.NewFor(head1, tail1)
-                .TryMerge(ConsecutiveNumberInterval.NewFor(head2, tail2),
+            var isMerged = ConsecutiveNumberInterval.NewFor(new DomainEventPosition(head1, head1, head1), new DomainEventPosition(tail1, tail1, tail1))
+                .TryMerge(ConsecutiveNumberInterval.NewFor(new DomainEventPosition(head2, head2, head2), new DomainEventPosition(tail2, tail2, tail2)),
                     out _);
 
             isMerged.Should().BeFalse();
@@ -51,7 +51,7 @@ namespace UnitTests
 
         [Fact]
         public void throws_ArgumentException_if_head_is_greater_then_tail() =>
-            Assert.Throws<ArgumentException>(() => ConsecutiveNumberInterval.NewFor(2, 1));
+            Assert.Throws<ArgumentException>(() => ConsecutiveNumberInterval.NewFor(new DomainEventPosition(2, 2, 2), new DomainEventPosition(1, 1, 1)));
 
     }
 }

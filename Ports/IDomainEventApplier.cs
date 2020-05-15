@@ -7,7 +7,7 @@ namespace Ports
 {
     public interface IDomainEventApplier : IDisposable
     {
-        Task<long> ReadLastKnownDispatchedDomainEventNumber(CancellationToken cancellationToken);
+        Task<DomainEventPosition> ReadLastKnownDispatchedDomainEventNumber(CancellationToken cancellationToken);
         
         void Pass(IDomainEvent domainEvent);
     }

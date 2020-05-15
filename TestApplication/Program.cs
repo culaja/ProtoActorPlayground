@@ -20,7 +20,7 @@ namespace TestApplication
             
             var eventsToSend = Enumerable.Range(1, 53)
                 .Select(i => DomainEventBuilder.New()
-                    .WithNumber(i)
+                    .WithPosition(new DomainEventPosition(i, i, i))
                     .ForTopic($"Aggregate{i}")
                     .WithTopicVersion(i)
                     .WithData("{}")
@@ -38,7 +38,7 @@ namespace TestApplication
                 .Build();
 
             var lastDispatchedDomainEvent = await domainEventApplier.ReadLastKnownDispatchedDomainEventNumber(new CancellationToken());
-            foreach (var domainEvent in eventsToSend.Where(e => e.Number > lastDispatchedDomainEvent))
+            foreach (var domainEvent in eventsToSend.Where(e => e.Position.LogicalPosition > lastDispatchedDomainEvent.LogicalPosition))
             {
                 domainEventApplier.Pass(domainEvent);
             }
