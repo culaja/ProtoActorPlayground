@@ -9,8 +9,8 @@ hot service are applied after service restart.
 used as a source for domain events that need to be applied. The same
 Event Store server instance is used to save snapshot of the last known
 applied domain event.
-- `SourceStreamName` - Name of the stream in the Event Store where all 
-domain events are kept.
+- `StreamPrefix` - Prefix of each stream in event store which are being
+collected to feed the bus.
 - `Snapshot` - Snapshot of the last known applied domain event is also
 kept in the Event Store. *Name* of the snapshot can be set in this
 configuration as well as *PeriodMs* that dictates period of storing of

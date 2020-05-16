@@ -20,14 +20,14 @@ namespace EventStoreAdapter
         public static IEventStoreReader BuildUsing(Uri connectionString) => new EventStoreReader(connectionString);
         
         public IEventStoreSubscription SubscribeTo(
-            SourceStreamName sourceStreamName,
+            StreamPrefix streamPrefix,
             long startPosition,
             IEventStoreStreamMessageReceiver receiver)
         {
             var connection = GrabSingleEventStoreConnectionFor(_connectionString).Result;
 
             var catchUpSubscription = connection.SubscribeToStreamFrom(
-                sourceStreamName,
+                streamPrefix,
                 startPosition == -1 ? null : (long?)startPosition,
                 CatchUpSubscriptionSettings.Default,
                 (_, x) => receiver.Receive(Convert(x)));

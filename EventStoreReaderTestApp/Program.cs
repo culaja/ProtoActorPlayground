@@ -18,7 +18,7 @@ namespace EventStoreReaderTestApp
         static void Main(string[] args)
         {
             var subscription = EventStoreReader.BuildUsing(new Uri("tcp://localhost:1113")).SubscribeTo(
-                SourceStreamName.Of("AllDomainEvents"), -1, new EventStoreReceiver());
+                StreamPrefix.Of("AllDomainEvents"), -1, new EventStoreReceiver());
 
             Console.ReadLine();
             subscription.Dispose();

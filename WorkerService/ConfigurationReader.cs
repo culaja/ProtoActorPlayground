@@ -10,8 +10,8 @@ namespace WorkerService
         public static Uri EventStoreConnectionString(this IConfiguration configuration) =>
             new Uri(ApplicationConfigurationFrom(configuration).EventStoreConnectionString);
         
-        public static SourceStreamName SourceStreamName(this IConfiguration configuration) => 
-            Domain.SourceStreamName.Of(ApplicationConfigurationFrom(configuration).SourceStreamName);
+        public static StreamPrefix StreamPrefix(this IConfiguration configuration) => 
+            Domain.StreamPrefix.Of(ApplicationConfigurationFrom(configuration).StreamPrefix);
 
         public static SnapshotConfiguration SnapshotConfiguration(this IConfiguration configuration)
         {
@@ -34,7 +34,7 @@ namespace WorkerService
         private sealed class ApplicationConfiguration
         {
             public string EventStoreConnectionString { get; set; }
-            public string SourceStreamName { get; set; }
+            public string StreamPrefix { get; set; }
             public Snapshot Snapshot { get; set; }
             public string DestinationServiceUri { get; set; }
             public int MaxConnectionsPerServer { get; set; }

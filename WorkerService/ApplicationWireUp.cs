@@ -13,7 +13,7 @@ namespace WorkerService
             => service
                 .RegisterLogger()
                 .RegisterEventStoreAdapterUsing(configuration)
-                .RegisterSourceStreamNameUsing(configuration)
+                .RegisterStreamPrefixUsing(configuration)
                 .RegisterProtoActorAdapterUsing(configuration)
                 .RegisterHttpClientAdapterUsing(configuration)
                 .AddHostedService<Worker>();
@@ -24,8 +24,8 @@ namespace WorkerService
         private static IServiceCollection RegisterEventStoreAdapterUsing(this IServiceCollection service, IConfiguration configuration)
             => service.AddSingleton(EventStoreReader.BuildUsing(configuration.EventStoreConnectionString()));
 
-        private static IServiceCollection RegisterSourceStreamNameUsing(this IServiceCollection service, IConfiguration configuration)
-            => service.AddSingleton(configuration.SourceStreamName());
+        private static IServiceCollection RegisterStreamPrefixUsing(this IServiceCollection service, IConfiguration configuration)
+            => service.AddSingleton(configuration.StreamPrefix());
 
         private static IServiceCollection RegisterProtoActorAdapterUsing(this IServiceCollection service,
             IConfiguration configuration)
