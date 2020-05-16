@@ -10,21 +10,24 @@ namespace EventStoreAdapter
     public sealed class SourceProjectionCreator
     {
         private readonly ProjectionsManager _projectionsManager;
+        private readonly UserCredentials _extractUserCredentials;
 
         private string ProjectionBodyFor(StreamPrefix streamPrefix) =>
             "fromAll().when({ `$any : function(s,e) { if (e.streamId.startsWith('STREAM_PREFIX')) linkTo('AllEvents-STREAM_PREFIX', e); }});"
                 .Replace("STREAM_PREFIX", streamPrefix);
 
-        private SourceProjectionCreator(ProjectionsManager projectionsManager)
+        private SourceProjectionCreator(ProjectionsManager projectionsManager, UserCredentials extractUserCredentials)
         {
             _projectionsManager = projectionsManager;
+            _extractUserCredentials = extractUserCredentials;
         }
         
         public static SourceProjectionCreator NewFor(Uri connectionString) => new SourceProjectionCreator(
             new ProjectionsManager(
                 new NoEventStoreLogger(),
                 connectionString.ToDnsEndPoint(),
-                TimeSpan.FromSeconds(60)));
+                TimeSpan.FromSeconds(60)),
+            connectionString.ExtractUserCredentials());
         
         public bool CreateFor(StreamPrefix streamPrefix)
         {
@@ -34,7 +37,7 @@ namespace EventStoreAdapter
                     $"{streamPrefix}Projection",
                     ProjectionBodyFor(streamPrefix),
                     true,
-                    new UserCredentials("admin", "changeit")).Wait();
+                    _extractUserCredentials).Wait();
             }
             catch (AggregateException e)
             {
