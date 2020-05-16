@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Threading;
+using Domain;
 
 namespace Ports
 {
@@ -7,6 +8,7 @@ namespace Ports
         IEventStoreSubscription SubscribeTo(
             StreamPrefix streamPrefix,
             long startPosition,
+            CancellationToken token,
             IEventStoreStreamMessageReceiver receiver);
     }
 }

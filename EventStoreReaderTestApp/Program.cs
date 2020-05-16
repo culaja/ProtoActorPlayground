@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Domain;
 using EventStoreAdapter;
 using Ports;
@@ -18,7 +19,10 @@ namespace EventStoreReaderTestApp
         static void Main(string[] args)
         {
             var subscription = EventStoreReader.BuildUsing(new Uri("tcp://localhost:1113")).SubscribeTo(
-                StreamPrefix.Of("AllDomainEvents"), -1, new EventStoreReceiver());
+                StreamPrefix.Of("AllDomainEvents"), 
+                -1,
+                new CancellationToken(),
+                new EventStoreReceiver());
 
             Console.ReadLine();
             subscription.Dispose();

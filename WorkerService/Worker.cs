@@ -40,7 +40,7 @@ namespace WorkerService
         {
             var startPosition = await _domainEventApplier.ReadLastKnownDispatchedDomainEventNumber(stoppingToken);
             _logger.Information($"Last known dispatched domain event number is '{startPosition}'.");
-            using (_eventStoreReader.SubscribeTo(_domainEventsStreamPrefix, startPosition,this))
+            using (_eventStoreReader.SubscribeTo(_domainEventsStreamPrefix, startPosition, stoppingToken, this))
             {
                 await stoppingToken.WaitAsync();
             }

@@ -13,7 +13,7 @@ namespace EventStoreAdapter
         private readonly UserCredentials _extractUserCredentials;
 
         private string ProjectionBodyFor(StreamPrefix streamPrefix) =>
-            "fromAll().when({ `$any : function(s,e) { if (e.streamId.startsWith('STREAM_PREFIX')) linkTo('AllEvents-STREAM_PREFIX', e); }});"
+            "fromAll().when({ $any : function(s,e) { if (e.streamId.startsWith('STREAM_PREFIX')) linkTo('AllEvents-STREAM_PREFIX', e); }});"
                 .Replace("STREAM_PREFIX", streamPrefix);
 
         private SourceProjectionCreator(ProjectionsManager projectionsManager, UserCredentials extractUserCredentials)

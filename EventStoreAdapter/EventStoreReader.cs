@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using Domain;
 using EventStore.ClientAPI;
 using Ports;
@@ -22,17 +23,37 @@ namespace EventStoreAdapter
         public IEventStoreSubscription SubscribeTo(
             StreamPrefix streamPrefix,
             long startPosition,
+            CancellationToken token,
             IEventStoreStreamMessageReceiver receiver)
         {
             var connection = GrabSingleEventStoreConnectionFor(_connectionString).Result;
 
+            CreateProjectionFor(streamPrefix, token);
+
             var catchUpSubscription = connection.SubscribeToStreamFrom(
-                streamPrefix,
+                $"AllEvents-{streamPrefix}",
                 startPosition == -1 ? null : (long?)startPosition,
                 CatchUpSubscriptionSettings.Default,
                 (_, x) => receiver.Receive(Convert(x)));
             
             return new EventStoreSubscription(catchUpSubscription);
+        }
+
+        private void CreateProjectionFor(StreamPrefix streamPrefix, CancellationToken token)
+        {
+            var sourceProjectionCreator = SourceProjectionCreator.NewFor(_connectionString);
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    sourceProjectionCreator.CreateFor(streamPrefix);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent) =>
