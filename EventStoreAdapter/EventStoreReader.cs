@@ -12,13 +12,16 @@ namespace EventStoreAdapter
     public sealed class EventStoreReader : IEventStoreReader
     {
         private readonly Uri _connectionString;
+        private readonly IInternalLogger _logger;
 
-        private EventStoreReader(Uri connectionString)
+        private EventStoreReader(Uri connectionString, IInternalLogger logger)
         {
             _connectionString = connectionString;
+            _logger = logger;
         }
 
-        public static IEventStoreReader BuildUsing(Uri connectionString) => new EventStoreReader(connectionString);
+        public static IEventStoreReader BuildUsing(Uri connectionString, IInternalLogger logger) 
+            => new EventStoreReader(connectionString, logger);
         
         public IEventStoreSubscription SubscribeTo(
             StreamPrefix streamPrefix,
@@ -28,32 +31,16 @@ namespace EventStoreAdapter
         {
             var connection = GrabSingleEventStoreConnectionFor(_connectionString).Result;
 
-            CreateProjectionFor(streamPrefix, token);
+            var sourceProjectionCreator = SourceProjectionCreator.NewFor(_connectionString, _logger);
+            sourceProjectionCreator.Create(streamPrefix, token);
 
             var catchUpSubscription = connection.SubscribeToStreamFrom(
-                $"AllEvents-{streamPrefix}",
+                streamPrefix.ToStreamName(),
                 startPosition == -1 ? null : (long?)startPosition,
                 CatchUpSubscriptionSettings.Default,
                 (_, x) => receiver.Receive(Convert(x)));
             
             return new EventStoreSubscription(catchUpSubscription);
-        }
-
-        private void CreateProjectionFor(StreamPrefix streamPrefix, CancellationToken token)
-        {
-            var sourceProjectionCreator = SourceProjectionCreator.NewFor(_connectionString);
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    sourceProjectionCreator.CreateFor(streamPrefix);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
         }
 
         private static DomainEventBuilder Convert(ResolvedEvent resolvedEvent) =>

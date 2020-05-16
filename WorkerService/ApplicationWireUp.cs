@@ -22,7 +22,10 @@ namespace WorkerService
             => service.AddSingleton(provider => Logger.New());
 
         private static IServiceCollection RegisterEventStoreAdapterUsing(this IServiceCollection service, IConfiguration configuration)
-            => service.AddSingleton(EventStoreReader.BuildUsing(configuration.EventStoreConnectionString()));
+            => service.AddSingleton(provider =>
+                EventStoreReader.BuildUsing(
+                    configuration.EventStoreConnectionString(),
+                    provider.GetService<IInternalLogger>()));
 
         private static IServiceCollection RegisterStreamPrefixUsing(this IServiceCollection service, IConfiguration configuration)
             => service.AddSingleton(configuration.StreamPrefix());
@@ -33,7 +36,7 @@ namespace WorkerService
                 .Using(configuration.SnapshotConfiguration())
                 .DecorateWith(provider.GetService<IInternalLogger>())
                 .Build());
-
+        
         private static IServiceCollection RegisterHttpClientAdapterUsing(this IServiceCollection service, IConfiguration configuration)
             => service.AddSingleton(provider => HttpApplyDomainEventStrategyBuilder.New()
                 .WithDestinationUri(configuration.DestinationServiceUri())

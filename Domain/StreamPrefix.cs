@@ -20,7 +20,9 @@ namespace Domain
         }
 
         public override string ToString() => _name;
-
+        
+        public string ToStreamName() => $"AllEvents-{_name}";
+        
         public static implicit operator string(StreamPrefix streamPrefix) => streamPrefix.ToString();
     }
 }

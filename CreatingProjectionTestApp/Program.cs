@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Domain;
 using EventStoreAdapter;
 
@@ -6,18 +7,14 @@ namespace CreatingProjectionTestApp
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var connectionString = new Uri("tcp://admin:changeit@localhost:1113");
             var streamPrefix = StreamPrefix.Of("Domain");
             
-            var projectionCreator = SourceProjectionCreator.NewFor(connectionString);
+            var projectionCreator = SourceProjectionCreator.NewFor(connectionString, ConsoleInternalLogger.New());
 
-            var isCreated = projectionCreator.CreateFor(streamPrefix);
-            
-            Console.WriteLine(isCreated 
-                ? $"Successfully created projection for stream prefix '{streamPrefix}'"
-                : $"Projection for stream prefix '{streamPrefix}' is already created.");
+            projectionCreator.Create(streamPrefix, new CancellationToken());
         }
     }
 }
