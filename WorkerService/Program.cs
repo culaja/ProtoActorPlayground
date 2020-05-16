@@ -11,11 +11,8 @@ namespace WorkerService
 
         public static void Main(string[] args)
         {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
-                .AddJsonFileFrom(args)
                 .AddEnvironmentVariables()
                 .Build();
             
